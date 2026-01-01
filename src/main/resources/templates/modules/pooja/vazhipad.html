@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/app.html}">
+
+<th:block layout:fragment="head">
+	<title>Vahipad</title>
+</th:block>
+
+<div layout:fragment="content" class="p-4">
+	<style>
+		#customerResults {
+			max-height: 200px;
+			overflow-y: auto;
+			border: 1px solid #ddd;
+			border-radius: 6px;
+			background: white;
+			position: absolute;
+			width: 100%;
+			z-index: 50;
+		}
+
+		.suggestion-active {
+			background-color: #e5e7eb;
+		}
+	</style>
+
+	<div class="space-y-10 p-5">
+
+		<div class="grid grid-cols-6 gap-6">
+
+			<div class="col-span-1">
+				<div class="grid grid-cols-3 gap-4">
+					<div class="col-span-1">
+						<label class="block text-gray-700 font-medium mb-1">&nbsp;</label>
+
+						<div class="flex items-center gap-2">
+							<input type="checkbox" id="poojaBooking"
+								class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+							<label for="poojaBooking" class="text-sm text-gray-700 font-medium cursor-pointer">
+								Booking
+							</label>
+						</div>
+					</div>
+
+					<div class="col-span-2">
+						<label for="poojaBookingDate" class="block text-gray-700 font-medium mb-1">Booking Date</label>
+						<input type="date" id="poojaBookingDate"
+							class="clear-input move-next w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400 no-drop">
+					</div>
+				</div>
+			</div>
+			<div class="col-span-1">
+				<label for="poojaDate" class="block text-gray-700 font-medium mb-1">Date</label>
+				<input type="date" id="poojaDate"
+					class="clear-input move-next w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
+					th:value="${today}">
+			</div>
+			<div class="relative">
+				<label for="fullName" class="block text-gray-700 font-medium mb-1">Full Name</label>
+				<input type="text" id="fullName" name="fullName"
+					class="clear-input move-next w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
+					placeholder="Enter Full Name">
+				<div id="customerResults" class="hidden"></div>
+			</div>
+			<div>
+				<label for="familyName" class="block text-gray-700 font-medium mb-1">Phone Number</label>
+				<input type="text" id="phoneNumber" name="phoneNumber"
+					class="clear-input move-next w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
+					placeholder="Enter Phone Number">
+			</div>
+			<div>
+				<label for="familyName" class="block text-gray-700 font-medium mb-1">Family Name</label>
+				<input type="text" id="familyName" name="familyName"
+					class="clear-input move-next w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
+					placeholder="Enter Family Name">
+			</div>
+			<div>
+				<label for="address" class="block text-gray-700 font-medium mb-1">Address</label>
+				<input type="text" id="address" name="address"
+					class="clear-input move-next w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
+					placeholder="Enter Address">
+			</div>
+		</div>
+
+		<div class="grid grid-cols-6 gap-6">
+
+			<div class="relative">
+				<label class="block text-gray-700 font-medium mb-1">Nakshatram</label>
+				<select id="nakshatra" name="nakshatra"
+					class="w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400">
+					<option value="">Choose Nakshathram</option>
+				</select>
+			</div>
+			
+			<div class="relative">
+				<label class="block text-gray-700 font-medium mb-1">Pooja/Offerings</label>
+				<select id="poojaMaster" name="poojaMaster"
+					class="move-next w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400 pooja-fields">
+					<option value="">Pooja/Offerings</option>
+				</select>
+			</div>
+			<div>
+				<label for="poojaPrefixPrefix" class="block text-gray-700 font-medium mb-1">Prefix Preview</label>
+				<input type="text" id="poojaPrefixPrefix" name="poojaPrefixPrefix"
+					class="pooja-fields w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400 no-drop"
+					value="@N@" readonly>
+			</div>
+			<div>
+				<label for="poojaAmount" class="block text-gray-700 font-medium mb-1">Amount</label>
+				<input type="text" id="poojaAmount" name="poojaAmount"
+					class="pooja-fields w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400 no-drop-color"
+					value="0">
+			</div>
+
+			<div>
+				<label class="block text-gray-700 font-medium mb-1">Total Amount</label>
+				<input type="text" id="totalAmount"
+					class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400 no-drop"
+					placeholder="0">
+			</div>
+			<div class="col-span-1 flex items-end space-x-3">
+
+				<button id="addPoojaBtn"
+					class="move-next px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 shadow">
+					✓
+				</button>
+
+				<button id="clearPoojaFields"
+					class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 shadow">
+					✕
+				</button>
+			</div>
+		</div>
+
+		<div class="grid grid-cols-6 gap-6 " id="paymodeAppendBlock">
+			<div>
+				<label for="payingAmount" id="payingAmountLabel" class="block text-gray-700 font-medium mb-1">Paying Amount</label>
+				<input type="text" id="payingAmount" name="payingAmount"
+					class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400 no-drop-color"
+					placeholder="0">
+			</div>
+			<div>
+				<label for="payModeChosen" class="block text-gray-700 font-medium mb-1">Paymode</label>
+				<select id="payModeChosen"
+					class="w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400">
+				</select>
+			</div>
+
+			<div>
+				<label for="payingReferenceNumber" class="block text-gray-700 font-medium mb-1">Reference Number</label>
+				<input type="text" id="payingReferenceNumber"
+					class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400 "
+					placeholder="">
+			</div>
+
+			<div>
+				<label for="payingReferenceDate" class="block text-gray-700 font-medium mb-1">Reference Date</label>
+				<input type="date" id="payingReferenceDate"
+					class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400 "
+					placeholder="">
+			</div>
+			<div>
+				<label for="payingAmount" class="block text-gray-700 font-medium mb-1">Reamrk</label>
+				<input type="text" id="payingRemark"
+					class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400 "
+					placeholder="">
+			</div>
+			<div class="flex items-end space-x-3">
+				<button id="savePooja" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 shadow">
+					Save & Print
+				</button>
+
+				<button class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 shadow">
+					Cancel
+				</button>
+			</div>
+
+		</div>
+
+		<div class=" mt-2">
+			<div class="errorAppendArea"></div>
+		</div>
+		<div class="" id="chosenPoojaDetailsBlock">
+			<table class="app-table" id="chosenPoojaDetailsTable">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Pooja Name</th>
+						<th>Prefix</th>
+						<th>Amount</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
+
+	</div>
+
+	<input type="hidden" id="vendorId" value="">
+</div>
+
+
+
+<div layout:fragment="scripts">
+	<script th:src="@{/assets/modules/pooja/vazhipad.js}"></script>
+</div>
+
+
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/app.html}">
+
+<th:block layout:fragment="head">
+	<title>Dashboard</title>
+</th:block>
+
+<div layout:fragment="content" class="p-4 pt-16">
+	<script src="https://cdn.tailwindcss.com"></script>
+
+	<!-- Chart.js CDN -->
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+	<!-- Flatpickr (Calendar) CDN -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+	<style>
+		/* Custom card shadow for dashboard */
+		.card {
+			@apply bg-white/80 backdrop-blur-md rounded-xl p-4 shadow-lg;
+		}
+	</style>
+	<div class="flex">
+
+
+		<!-- Main content -->
+		<main class="flex-1 p-6 space-y-6">
+
+			<!-- Header -->
+			<header class="flex justify-between items-center mb-6">
+				<h2 class="text-2xl font-bold text-purple-900">Dashboard</h2>
+				<div>
+					<input type="text" id="calendar" class="border rounded-md px-2 py-1 shadow-sm">
+				</div>
+			</header>
+
+			<!-- Charts -->
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+				<div class="card">
+					<h3 class="font-semibold mb-2 text-purple-800">Poojas Completed</h3>
+					<canvas id="poojaChart" height="200"></canvas>
+				</div>
+
+				<div class="card">
+					<h3 class="font-semibold mb-2 text-purple-800">Devotee Registrations</h3>
+					<canvas id="devoteeChart" height="200"></canvas>
+				</div>
+
+				<div class="card">
+					<h3 class="font-semibold mb-2 text-purple-800">Vazhipads</h3>
+					<canvas id="vazhipadChart" height="100"></canvas>
+				</div>
+
+			</div>
+
+
+			<!-- calamned-->
+			<div id="panchangCalendar"
+				class="bg-white/80 backdrop-blur-md rounded-xl shadow-lg p-4 w-full max-w-md mx-auto">
+				<h2 class="text-lg font-semibold mb-4 text-[#3B1E8A]">Calendar</h2>
+
+				<div id="calendarGrid" class="grid gap-1"></div>
+
+				<div id="dayDetails" class="mt-4 p-3 rounded-lg bg-indigo-50 text-gray-800 hidden">
+					<h3 class="font-semibold mb-2" id="selectedDate"></h3>
+					<ul class="text-sm space-y-1" id="panchangInfo"></ul>
+				</div>
+			</div>
+
+			<script src="https://cdn.jsdelivr.net/npm/panchang-js@latest/dist/panchang.min.js"></script>
+
+			<script>
+				const observer = {latitude: 8.5, longitude: 76.9, timezone: 'Asia/Kolkata'};
+
+				function getDataFor(date) {
+					return panchang.calculate(date, observer);
+				}
+
+				function renderCalendar(year, month) {
+					const calendarGrid = document.getElementById("calendarGrid");
+					calendarGrid.innerHTML = "";
+
+					const first = new Date(year, month, 1);
+					const last = new Date(year, month + 1, 0);
+					const startDay = first.getDay();
+					const daysInMonth = last.getDate();
+
+					const header = document.createElement("div");
+					header.className = "grid grid-cols-7 mb-1 text-sm font-medium text-gray-700";
+					["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(d => {
+						const dEl = document.createElement("div");
+						dEl.className = "p-1 text-center";
+						dEl.textContent = d;
+						header.append(dEl);
+					});
+					calendarGrid.append(header);
+
+					const grid = document.createElement("div");
+					grid.className = "grid grid-cols-7 gap-1";
+
+					for (let i = 0; i < startDay; i++) {
+						grid.append(document.createElement("div"));
+					}
+
+					for (let d = 1; d <= daysInMonth; d++) {
+						const date = new Date(year, month, d);
+						const cell = document.createElement("div");
+						cell.className = "border border-gray-300 p-2 text-center relative rounded cursor-pointer hover:bg-indigo-50";
+
+						const today = new Date();
+						if (date.toDateString() === today.toDateString()) {
+							cell.classList.add("bg-indigo-200", "font-semibold");
+						}
+
+						const dtSpan = document.createElement("div");
+						dtSpan.textContent = d;
+						cell.append(dtSpan);
+
+						// Compute panchang data
+						let p = getDataFor(date);
+						if (p && p.tithi && p.nakshatra) {
+							const info = document.createElement("div");
+							info.className = "text-xs text-gray-700 mt-1";
+							info.innerHTML = `${p.tithi.name}<br>${p.nakshatra.name}`;
+							cell.append(info);
+						}
+
+						cell.addEventListener("click", () => {
+							let detail = getDataFor(date);
+							document.getElementById("selectedDate").textContent = date.toDateString();
+							document.getElementById("panchangInfo").innerHTML = `
+			          <li><strong>Day (Vara):</strong> ${detail.vara.name}</li>
+			          <li><strong>Tithi:</strong> ${detail.tithi.name}</li>
+			          <li><strong>Nakshatra:</strong> ${detail.nakshatra.name}</li>
+			          <li><strong>Yoga:</strong> ${detail.yoga.name}</li>
+			          <li><strong>Karana:</strong> ${detail.karana.name}</li>
+			          <li><strong>Sunrise:</strong> ${detail.sunrise.toLocaleTimeString()}</li>
+			          <li><strong>Sunset:</strong> ${detail.sunset.toLocaleTimeString()}</li>
+			        `;
+							document.getElementById("dayDetails").classList.remove("hidden");
+						});
+
+						grid.append(cell);
+					}
+
+					calendarGrid.append(grid);
+				}
+
+				const now = new Date();
+				renderCalendar(now.getFullYear(), now.getMonth());
+			</script>
+
+
+
+		</main>
+	</div>
+
+	<!-- Chart.js scripts -->
+	<script>
+		const poojaChart = new Chart(document.getElementById('poojaChart'), {
+			type: 'bar',
+			data: {
+				labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+				datasets: [{
+					label: 'Poojas',
+					data: [12, 19, 14, 20, 18, 25],
+					backgroundColor: 'rgba(59,30,138,0.7)',
+					borderColor: 'rgba(59,30,138,1)',
+					borderWidth: 1,
+					borderRadius: 6
+				}]
+			},
+			options: {
+				responsive: true,
+				scales: {
+					y: {
+						beginAtZero: true
+					}
+				}
+			}
+		});
+
+		const devoteeChart = new Chart(document.getElementById('devoteeChart'), {
+			type: 'line',
+			data: {
+				labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+				datasets: [{
+					label: 'Devotees',
+					data: [5, 12, 8, 15, 20, 25],
+					fill: true,
+					backgroundColor: 'rgba(90,53,196,0.2)',
+					borderColor: 'rgba(90,53,196,1)',
+					tension: 0.3
+				}]
+			},
+			options: {responsive: true}
+		});
+
+		const vazhipadChart = new Chart(document.getElementById('vazhipadChart'), {
+			type: 'doughnut',
+			data: {
+				labels: ['Morning', 'Noon', 'Evening'],
+				datasets: [{
+					label: 'Vazhipads',
+					data: [30, 50, 20],
+					backgroundColor: [
+						'rgba(59,30,138,0.7)',
+						'rgba(90,53,196,0.7)',
+						'rgba(155,102,250,0.7)'
+					],
+					borderColor: 'white',
+					borderWidth: 2
+				}]
+			},
+			options: {responsive: true}
+		});
+	</script>
+
+	<!-- Flatpickr Calendar -->
+	<script>
+		flatpickr("#calendar", {
+			defaultDate: "today",
+			dateFormat: "F j, Y",
+			disableMobile: true
+		});
+	</script>
+
+</div>
+
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ml">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Receipt Print</title>
+
+	<style>
+		@page {
+			size: A4;
+			margin: 0;
+		}
+
+		body {
+			margin: 0;
+			padding: 0;
+			font-family: "Noto Sans Malayalam", sans-serif;
+		}
+
+		.html-page-wrapper {
+			width: 210mm;
+			height: 297mm;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.html-receipt {
+			height: 99mm;
+			/* 3 receipts per page */
+			width: 100%;
+			box-sizing: border-box;
+			padding: 10mm;
+			border-bottom: 1px dashed #000;
+		}
+
+		.html-box {
+			border: 2px solid #000;
+			padding: 10px;
+			height: 100%;
+			position: relative;
+		}
+
+		.html-header {
+			text-align: center;
+			font-weight: bold;
+			font-size: 18px;
+			line-height: 1.4;
+		}
+
+		.html-logo {
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			width: 40px;
+		}
+
+		.html-sub-title {
+			background: #002d88;
+			color: white;
+			display: inline-block;
+			padding: 2px 8px;
+			margin-top: 5px;
+			font-size: 14px;
+			border-radius: 3px;
+		}
+
+		.html-row {
+			margin-top: 12px;
+			font-size: 16px;
+		}
+
+		.html-field label {
+			display: inline-block;
+			width: 80px;
+		}
+
+		.html-field .html-line {
+			display: inline-block;
+			width: 70%;
+			border-bottom: 1px dotted #000;
+			padding-bottom: 2px;
+		}
+
+		.html-amount-box {
+			position: absolute;
+			bottom: 15px;
+			left: 10px;
+			font-size: 18px;
+			font-weight: bold;
+		}
+
+		.html-treasurer {
+			position: absolute;
+			bottom: 15px;
+			right: 20px;
+			font-size: 16px;
+		}
+
+		.html-red {
+			color: red;
+			font-weight: bold;
+		}
+	</style>
+
+</head>
+
+<body>
+
+	<div class="page-wrapper">
+
+		<!-- RECEIPT 1 -->
+		<div class="receipt">
+			<div class="box">
+				<img src="/images/logo.png" class="logo">
+
+				<div class="header">
+					ശ്രീ പ്രാഞ്ചേരി കണ്‍സ്ടണ്‍ ശാസ്താ ക്ഷേത്രം<br>
+					എസ്.ടി മക്കാട്<br>
+					<span class="sub-title">നിരാഞ്ജനം രസീത്</span>
+				</div>
+
+				<div class="row field">
+					<label>നമ്പർ:</label>
+					<span class="red">195</span>
+					<span style="float:right;">തീയതി: ________</span>
+				</div>
+
+				<div class="row field">
+					<label>പേര്:</label>
+					<span class="line"></span>
+				</div>
+
+				<div class="row field">
+					<label>വിലാസം:</label>
+					<span class="line"></span>
+				</div>
+
+				<div class="row field">
+					<label>നിക്ഷേപം:</label>
+					<span class="line"></span>
+				</div>
+
+				<div class="amount-box">Rs. 50/-</div>
+				<div class="treasurer">Treasurer</div>
+			</div>
+		</div>
+
+		<!-- RECEIPT 2 -->
+		<div class="receipt">
+			<div class="box">
+				<img src="/images/logo.png" class="logo">
+
+				<div class="header">
+					ശ്രി പ്രാഞ്ചേരി കണ്‍സ്ടണ്‍ ശാസ്താ ക്ഷേത്രം<br>
+					എസ്.ടി മക്കാട്<br>
+					<span class="sub-title">നിരാഞ്ജനം രസീത്</span>
+				</div>
+
+				<div class="row field">
+					<label>നമ്പർ:</label>
+					<span class="red">195</span>
+					<span style="float:right;">തീയതി: ________</span>
+				</div>
+
+				<div class="row field">
+					<label>പേര്:</label>
+					<span class="line"></span>
+				</div>
+
+				<div class="row field">
+					<label>വിലാസം:</label>
+					<span class="line"></span>
+				</div>
+
+				<div class="row field">
+					<label>നിക്ഷേപം:</label>
+					<span class="line"></span>
+				</div>
+
+				<div class="amount-box">Rs. 50/-</div>
+				<div class="treasurer">Treasurer</div>
+			</div>
+		</div>
+
+		<!-- RECEIPT 3 -->
+		<div class="receipt">
+			<div class="box">
+				<img src="/images/logo.png" class="logo">
+
+				<div class="header">
+					ശ്രി പ്രാഞ്ചേരി കണ്‍സ്ടണ്‍ ശാസ്താ ക്ഷേത്രം<br>
+					എസ്.ടി മക്കാട്<br>
+					<span class="sub-title">നിരാഞ്ജനം രസീത്</span>
+				</div>
+
+				<div class="row field">
+					<label>നമ്പർ:</label>
+					<span class="red">195</span>
+					<span style="float:right;">തീയതി: ________</span>
+				</div>
+
+				<div class="row field">
+					<label>പേര്:</label>
+					<span class="line"></span>
+				</div>
+
+				<div class="row field">
+					<label>വിലാസം:</label>
+					<span class="line"></span>
+				</div>
+
+				<div class="row field">
+					<label>നിക്ഷേപം:</label>
+					<span class="line"></span>
+				</div>
+
+				<div class="amount-box">Rs. 50/-</div>
+				<div class="treasurer">Treasurer</div>
+			</div>
+		</div>
+
+	</div>
+
+</body>
+
+</html>

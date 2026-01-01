@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<aside th:fragment="aside" class="fixed top-0 left-0 h-full w-64 bg-[var(--sidebar-bg)] backdrop-blur-md shadow-lg z-50 
+           border-r border-gray-200  flex flex-col">
+
+	<!-- Header -->
+	<div class="sidebar-header flex items-center px-4 py-4 border-b border-gray-200 space-x-2">
+		<a href="/web/auth/dashboard" class="flex items-center space-x-2">
+			<img th:src="@{/dynamic/assets/app_images/logo.png}" alt="Logo" class="h-8 w-8 rounded-full">
+			<span class="sidebar-title">Kovil</span>
+		</a>
+	</div>
+
+	<!-- NAVIGATION -->
+	<nav class="sidebar-nav p-4 flex flex-col flex-grow">
+
+		<div class="flex flex-col space-y-2">
+			<a th:href="@{/web/pooja/master}" class="sidebar-link">Pooja Master</a>
+			<a th:href="@{/web/vazhipad}" class="sidebar-link">Vazhipad</a>
+			<a th:href="@{/web/report}" class="sidebar-link">Reports</a>
+
+			<div class="group/accounts relative">
+				<div class="sidebar-link cursor-pointer flex justify-between items-center">
+					<span>Accounts</span>
+					<i class="fas fa-chevron-right transition-transform group-hover/accounts:rotate-90"></i>
+				</div>
+				<div class="hidden group-hover/accounts:block ml-4 mt-1 space-y-1">
+					<a th:href="@{/web/accounts/groups}" class="sidebar-link">Groups</a>
+					<a th:href="@{/web/accounts/ledgers}" class="sidebar-link">Ledgers</a>
+					<div class="group/vouchers relative">
+						<div class="sidebar-link cursor-pointer flex justify-between items-center">
+							<span>Vouchers</span>
+							<i class="fas fa-chevron-right transition-transform group-hover/vouchers:rotate-90"></i>
+						</div>
+						<div class="hidden group-hover/vouchers:block ml-4 mt-1 space-y-1">
+							<a th:href="@{/web/accounts/opening-balance}" class="sidebar-link">Opening Balance</a>
+							<a th:href="@{/web/accounts/vouchers/payment}" class="sidebar-link">Payment</a>
+							<a th:href="@{/web/accounts/vouchers/receipt}" class="sidebar-link">Receipt</a>
+							<a th:href="@{/web/accounts/vouchers/journal}" class="sidebar-link">Journal</a>
+							<a th:href="@{/web/accounts/vouchers/contra}" class="sidebar-link">Contra</a>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+			<div class="group relative">
+				<div class="sidebar-link cursor-pointer flex justify-between items-center">
+					<span>Inventory</span>
+					<i class="fas fa-chevron-right transition-transform group-hover:rotate-90"></i>
+				</div>
+
+				<div class="hidden group-hover:block ml-4 mt-1 space-y-1">
+					<a th:href="@{/web/inventory/item}" class="sidebar-link">Item</a>
+					<a th:href="@{/web/inventory/stock}" class="sidebar-link">Stock Inventory</a>
+					<a th:href="@{/web/inventory/stock-transaction}" class="sidebar-link">Stock Transaction</a>
+				</div>
+			</div>
+		</div>
+
+		<!-- BOTTOM BUTTON -->
+		<div class="mt-auto border-t border-gray-300 pt-3">
+			<button type="button" class="sidebar-link flex items-center justify-between w-full text-left"
+				onclick="openLogoutModal()">
+				<span>Logout</span>
+				<i class="fa-solid fa-right-from-bracket text-sm"></i>
+			</button>
+
+		</div>
+	</nav>
+
+</aside>
+
+
+
+
+<!--<aside th:fragment="aside"
+	class="fixed top-0 left-0 h-full w-64 bg-white/90 backdrop-blur-md shadow-lg z-50 border-r border-gray-200 rounded-r-2xl overflow-y-auto">
+
+	<div class="flex items-center px-4 py-4 border-b border-gray-200 space-x-2">
+		<img th:src="@{/dynamic/assets/app_images/logo.png}" alt="Logo" class="h-8 w-8 rounded-full">
+		<span class="font-bold text-lg text-gray-800">Kovil</span>
+	</div>
+
+	<nav class="p-4 flex flex-col space-y-2">
+		<a th:href="@{/web/pooja/master}"
+			class="sidebar-link px-4 py-2 rounded hover:bg-indigo-50 hover:text-indigo-600 transition">
+			Pooja Master</a>
+		<a th:href="@{/web/devotee}"
+			class="sidebar-link px-4 py-2 rounded hover:bg-indigo-50 hover:text-indigo-600 transition">Devotees</a>
+		<a th:href="@{/web/vazhipad}"
+			class="sidebar-link px-4 py-2 rounded hover:bg-indigo-50 hover:text-indigo-600 transition">Vazhipad</a>
+		<a th:href="@{/web/report}"
+			class="sidebar-link px-4 py-2 rounded hover:bg-indigo-50 hover:text-indigo-600 transition">Reports</a>
+		<a th:href="@{/web/settings}"
+			class="sidebar-link px-4 py-2 rounded hover:bg-indigo-50 hover:text-indigo-600 transition">Settings</a>
+	</nav>
+
+</aside>-->
+
+</html>

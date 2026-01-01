@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/app.html}">
+
+<th:block layout:fragment="head">
+	<title>Dashboard</title>
+</th:block>
+
+<div layout:fragment="content" class="p-4">
+
+	<div id="poojaModal"
+		class="hidden fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50 backdrop-blur-sm ">
+
+		<!-- Modal Box -->
+		<div class="modal-box bg-white rounded-lg shadow-lg p-6">
+
+			<div class="flex justify-between items-center border-b pb-3 mb-4">
+				<h2 class="text-xl font-semibold">Add New Pooja Master</h2>
+				<button id="closePoojaModal" class="text-gray-600 hover:text-black text-2xl">&times;</button>
+			</div>
+
+			<div class="space-y-10 p-5">
+
+				<div class="grid grid-cols-5 gap-6">
+
+					<div>
+						<label for="prefixInput" class="block text-gray-700 font-medium mb-1">
+							Receipt Prefix
+						</label>
+
+						<div class="flex gap-2 items-center">
+							<input type="text" id="prefixInput" name="prefix"
+								class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
+								placeholder="Ex: pooja1/@N@/@Y@">
+							<button id="addNBtn" class="px-3 py-2 bg-green-500 text-white rounded-md">@N@</button>
+							<button id="addYBtn" class="px-3 py-2 bg-blue-500 text-white rounded-md">@Y@</button>
+						</div>
+
+						<p class="text-gray-600 text-sm mt-2">
+							Preview: <span id="prefixPreview" class="font-semibold">P/@N@</span>
+						</p>
+
+						<p id="prefixError" class="text-red-500 text-sm mt-1 hidden error-label">
+							Prefix is required.
+						</p>
+					</div>
+
+					<div>
+						<label for="name" class="block text-gray-700 font-medium mb-1">Pooja Name</label>
+						<input type="text" id="name" name="name"
+							class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
+							placeholder="Enter Pooja Name">
+						<p id="nameError" class="text-red-500 text-sm mt-1 hidden error-label">Pooja Name is required.
+						</p>
+					</div>
+
+					<div>
+						<label for="groupName" class="block text-gray-700 font-medium mb-1">Group Name</label>
+						<input type="text" id="groupName" name="groupName"
+							class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
+							placeholder="Enter Group Name">
+						<p id="groupNameError" class="text-red-500 text-sm mt-1 hidden error-label">Group Name is
+							required.</p>
+					</div>
+
+					<div>
+						<label for="amount" class="block text-gray-700 font-medium mb-1">Amount</label>
+						<input type="text" id="amount" name="amount"
+							class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
+							placeholder="Enter Amount">
+					</div>
+
+					<div class="flex items-center pt-7">
+						<input id="variableAmount" type="checkbox" name="variableAmount"
+							class="clear-input w-4 h-4 border-gray-300 rounded focus:ring-indigo-500">
+						<label for="variableAmount" class="ml-2 text-gray-700 font-medium">Variable Amount</label>
+					</div>
+
+				</div>
+
+				<div class="grid grid-cols-5 gap-6">
+
+					<div>
+						<label for="specialAmount" class="block text-gray-700 font-medium mb-1">Special Amount</label>
+						<input type="text" id="specialAmount" name="specialAmount"
+							class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
+							placeholder="Enter Special Amount">
+					</div>
+
+					<div>
+						<label for="durationInMinutes" class="block text-gray-700 font-medium mb-1">Duration
+							(Minutes)</label>
+						<input type="number" id="durationInMinutes" name="durationInMinutes"
+							class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
+							placeholder="Enter Duration">
+					</div>
+
+					<div>
+						<label class="text-gray-700 font-medium mb-2 block">Only Specific Days?</label>
+
+						<div class="flex items-center space-x-6">
+							<label class="flex items-center">
+								<input id="specific-yes" type="radio" name="onlyOnSpecificDays" value="true"
+									class="clear-input w-4 h-4">
+								<span class="ml-2 text-sm">Yes</span>
+							</label>
+
+							<label class="flex items-center">
+								<input id="specific-no" type="radio" name="onlyOnSpecificDays" value="false" checked
+									class="clear-input w-4 h-4">
+								<span class="ml-2 text-sm">No</span>
+							</label>
+						</div>
+					</div>
+
+					<div>
+						<label for="allowedDays" class="block text-gray-700 font-medium mb-2">Allowed Days</label>
+						<select id="allowedDays" name="allowedDays" multiple
+							class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400">
+							<option value="MON">Monday</option>
+							<option value="TUE">Tuesday</option>
+							<option value="WED">Wednesday</option>
+							<option value="THU">Thursday</option>
+							<option value="FRI">Friday</option>
+							<option value="SAT">Saturday</option>
+							<option value="SUN">Sunday</option>
+						</select>
+						<p id="allowedDaysError" class="text-red-500 text-sm mt-1 hidden error-label">
+							Please Choose Allowed Days
+						</p>
+					</div>
+
+					<div>
+						<label class="block text-gray-700 font-medium mb-2">Description</label>
+						<textarea name="description"
+							class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
+							id="description" placeholder="List materials needed" rows="1"></textarea>
+					</div>
+
+				</div>
+
+				<div class="grid grid-cols-4 gap-6">
+
+					<label class="flex items-center space-x-2 pt-8">
+						<input type="checkbox" id="requiresBookingDate" name="requiresBookingDate"
+							class="clear-input w-4 h-4">
+						<span class="text-gray-700">Requires Booking Date</span>
+					</label>
+
+					<div>
+						<label class="block text-gray-700 font-medium mb-1">Cutoff Time</label>
+						<input type="time" name="cutoffTime" id="cutOffTime"
+							class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400">
+					</div>
+
+					<label class="flex items-center space-x-2 pt-8">
+						<input type="checkbox" name="requiresNakshathra" class="clear-input w-4 h-4"
+							id="requiresNakshathra">
+						<span class="text-gray-700">Requires Nakshathra</span>
+					</label>
+
+					<label class="flex items-center space-x-2 pt-8">
+						<input type="checkbox" name="requiresGothra" class="clear-input w-4 h-4" id="requiresGothra">
+						<span class="text-gray-700">Requires Gothra</span>
+					</label>
+
+				</div>
+
+				<div class="grid grid-cols-4 gap-6">
+
+					<div class="col-span-2">
+						<label class="block text-gray-700 font-medium mb-2">Materials List</label>
+						<textarea name="materialsList"
+							class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
+							id="materialsList" placeholder="List materials needed" rows="1"></textarea>
+					</div>
+
+					<div>
+						<label class="block text-gray-700 font-medium mb-1">Token Limit Per Day</label>
+						<input type="number" name="tokenLimitPerDay" id="tokenLimitPerDay"
+							class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400">
+					</div>
+
+					<div>
+						<label class="block text-gray-700 font-medium mb-1">Display Order</label>
+						<input type="number" name="displayOrder" id="displayOrder"
+							class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400">
+					</div>
+
+				</div>
+
+				<div class="flex justify-end space-x-2 mt-4">
+					<button type="button" id="clearItem"
+						class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+						Clear
+					</button>
+
+					<button type="button" id="saveItem"
+						class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+						Save
+					</button>
+				</div>
+
+			</div>
+		</div>
+		>
+	</div>
+
+	<div class="overflow-x-auto mt-2 bg-neutral-primary-soft block border border-default border-t-4 rounded-base shadow-xs"
+		id="poojaMasterPaginateArea">
+
+		<div class="flex justify-end mb-2 mx-2 gap-3">
+			<input class="search w-22 px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
+				placeholder="Search..." />
+
+			<button id="openPoojaModal" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+				Add New Pooja Master
+			</button>
+
+			<button class="excel-btn" id="excelExportPooja">Export Excel</button>
+
+		</div>
+		<table class="app-table" id="poojaMasterTable">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th class="sort" data-sort="name">Pooja Name</th>
+					<th class="sort" data-sort="groupName">Group Name</th>
+					<th class="sort" data-sort="amount">Amount</th>
+					<th>Prefix</th>
+					<th>Variable Amount</th>
+					<th>Special Amount</th>
+					<th>Pooja Duration (Minutes)</th>
+					<th>Only Specific Days?</th>
+					<th>Allowed Days</th>
+					<th>Requires Booking Date</th>
+					<th>Cutoff Time</th>
+					<th>Requires Nakshathra</th>
+					<th>Requires Gothra</th>
+					<th>Token Limit Per Day</th>
+					<th>Materials List</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody class="list">
+
+			</tbody>
+		</table>
+		<ul class="pagination"></ul>
+	</div>
+
+</div>
+
+<div layout:fragment="scripts">
+	<script th:src="@{/assets/lib/excel/exceljs.min.js}"></script>
+	<script th:src="@{/assets/lib/excel/common.js}"></script>
+	
+	<script th:src="@{/assets/lib/listmin.js}"></script>
+	<script th:src="@{/assets/modules/pooja/poojamaster.js}"></script>
+</div>
+
+
+</html>

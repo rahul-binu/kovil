@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/app.html}">
+
+<th:block layout:fragment="head">
+	<title>Pooja Report</title>
+	<link rel="stylesheet" th:href="@{/assets/lib/simplepagination/simplePagination.css}" />
+</th:block>
+
+<div layout:fragment="content" class="">
+
+	<div class="min-h-screen bg-gray-100 p-6">
+		<div class="max-w-8xl mx-auto">
+
+			<!-- Page Title -->
+			<h1 class="text-2xl font-bold text-gray-800 mb-6">
+				📊 Reports Dashboard
+			</h1>
+
+			<!-- Reports Grid -->
+			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+				<!-- Pooja Transaction Report -->
+				<a href="/web/report/pooja"
+					class="group bg-white p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer border hover:border-gray-200">
+					<div class="flex items-center gap-4">
+						<div
+							class="bg-blue-100 text-blue-600 p-3 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition">
+							<i class="fas fa-praying-hands fa-lg"></i>
+						</div>
+						<div>
+							<h3 class="font-semibold text-gray-800 text-lg group-hover:text-blue-600 transition">
+								Pooja Transaction Report
+							</h3>
+							<p class="text-gray-500 text-sm">View all pooja-related transactions</p>
+						</div>
+					</div>
+				</a>
+
+				<a href="/web/report/pooja-advance"
+					class="group bg-white p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer border hover:border-gray-200">
+					<div class="flex items-center gap-4">
+						<div
+							class="bg-blue-100 text-blue-600 p-3 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition">
+							<i class="fas fa-hand-holding-usd"></i>
+						</div>
+						<div>
+							<h3 class="font-semibold text-gray-800 text-lg group-hover:text-blue-600 transition">
+								Pooja Booking Report
+							</h3>
+							<p class="text-gray-500 text-sm">View all pooja-booking transactions</p>
+						</div>
+					</div>
+				</a>
+
+				<!-- Customer Details Report -->
+				<a th:href="@{/web/vendor/devotte}"
+					class="group bg-white p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer border hover:border-gray-200">
+					<div class="flex items-center gap-4">
+						<div
+							class="bg-green-100 text-green-600 p-3 rounded-lg group-hover:bg-green-600 group-hover:text-white transition">
+							<i class="fas fa-user fa-lg"></i>
+						</div>
+						<div>
+							<h3 class="font-semibold text-gray-800 text-lg group-hover:text-green-600 transition">
+								Devotee Details Report
+							</h3>
+							<p class="text-gray-500 text-sm">View all devotte information</p>
+						</div>
+					</div>
+				</a>
+
+				<!-- Daily Collection Report -->
+				<a th:href="@{/web/accounts/daybook}"
+					class="group bg-white p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer border hover:border-gray-200">
+					<div class="flex items-center gap-4">
+						<div
+							class="bg-orange-100 text-orange-600 p-3 rounded-lg group-hover:bg-orange-600 group-hover:text-white transition">
+							<i class="fas fa-book-open fa-lg"></i>
+						</div>
+						<div>
+							<h3 class="font-semibold text-gray-800 text-lg group-hover:text-orange-600 transition">
+								Day Book
+							</h3>
+							<p class="text-gray-500 text-sm">Track daily transaction overview</p>
+						</div>
+					</div>
+				</a>
+
+				<!-- Vendor Report -->
+				<a href="/reports/vendor"
+					class="group bg-white p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer border hover:border-gray-200">
+					<div class="flex items-center gap-4">
+						<div
+							class="bg-purple-100 text-purple-600 p-3 rounded-lg group-hover:bg-purple-600 group-hover:text-white transition">
+							<i class="fas fa-store fa-lg"></i>
+						</div>
+						<div>
+							<h3 class="font-semibold text-gray-800 text-lg group-hover:text-purple-600 transition">
+								Vendor Report
+							</h3>
+							<p class="text-gray-500 text-sm">View associated vendors list</p>
+						</div>
+					</div>
+				</a>
+
+			</div>
+		</div>
+	</div>
+
+</div>
+
+</html>

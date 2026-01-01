@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+	<meta charset="UTF-8">
+	<title th:text="${title}">Kovil</title>
+
+	<th:block th:replace="~{common/header :: head}"></th:block>
+</head>
+
+<body>
+
+	<header th:replace="~{common/header :: header}"></header>
+
+	<aside th:replace="~{common/sidebar :: aside}"></aside>
+
+	<main class="ml-64 pt-20 sm:pt-16 md:pt-20 lg:pt-[3%] content-wrapper">
+		<div layout:fragment="content">
+		</div>
+	</main>
+
+	<footer th:replace="~{common/footer :: footer}"></footer>
+
+	<section layout:fragment="scripts"></section>
+
+</body>
+
+</html>

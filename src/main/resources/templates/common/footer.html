@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+	<footer th:fragment="footer">
+
+		<form id="id_logout_form" th:action="@{/auth/logout}" method="POST" style="display:none;"></form>
+
+		<!-- Preloader -->
+		<div id="preloader">
+			<div id="preloader_status">&nbsp;</div>
+			<h3 class="preloader-text"></h3>
+		</div>
+
+		<!-- Universal Confirmation Modal -->
+		<div id="universalConfirmModal" class="my-modal-overlay">
+			<div class="my-modal-box">
+				<h3 id="universalConfirmHead">Are you sure?</h3>
+				<p id="universalConfirmText">You are about to perform this action.</p>
+
+				<div class="my-modal-actions">
+					<button id="universalConfirmBtn" class="my-btn-primary">Okay</button>
+					<button class="cancelMyModalBtn my-btn-secondary">Cancel</button>
+				</div>
+			</div>
+		</div>
+		<!-- Logout Confirmation Modal -->
+		<div id="logoutModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+			<div class="bg-white rounded-lg shadow-lg w-96 p-6">
+				<h2 class="text-lg font-semibold mb-4">Confirm Logout</h2>
+				<p class="mb-6 text-gray-700">Are you sure you want to logout?</p>
+				<div class="flex justify-end space-x-4">
+					<button class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+						onclick="closeLogoutModal()">Cancel</button>
+					<button class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+						onclick="confirmLogout()">Logout</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Message box container -->
+		<div id="main-message-box" class="main-message-box">
+			<div class="close-main-message text-gray-600 hover:text-black text-l">x</i></div>
+			<div id="main-message-head" class="main-message-head"></div>
+			<div id="main-message-content" class="main-message-content"></div>
+		</div>
+
+		<!-- Common hidden fields -->
+		<input type="hidden" id="jwtTocken" value="">
+
+
+		<!-- Global JS -->
+		<script th:src="@{/assets/lib/tailwind.min.js}"></script>
+		<script th:src="@{/assets/lib/choices/choices.min.js}"></script>
+		<script th:src="@{/assets/lib/jquery-3.7.1.min.js}"></script>
+		<script th:src="@{/assets/lib/auto-suggest.js}"></script>
+		<script th:src="@{/assets/common/js/app.js}"></script>
+
+	</footer>
+</body>
+
+</html>

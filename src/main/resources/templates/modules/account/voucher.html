@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/app.html}">
+
+<th:block layout:fragment="head">
+	<title>Voucher</title>
+</th:block>
+<div layout:fragment="content">
+	<link rel="stylesheet" th:href="@{/assets/lib/simplepagination/simplePagination.css}" />
+
+	<input type="hidden" id="voucherType" th:value="${vtype}">
+
+	<div class="min-h-screen bg-gray-100 p-6">
+		<div class="">
+
+			<div class="bg-white rounded-xl shadow-lg p-8 mb-12 border border-gray-100">
+
+				<div class="flex items-center my-10">
+					<div class="flex-grow border-b-2 border-blue-500"></div>
+					<span class="px-4 text-2xl font-bold text-gray-800"><span id="headdingType"></span> Voucher</span>
+					<div class="flex-grow border-b-2 border-blue-500"></div>
+				</div>
+
+				<div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+						<input type="date" id="voucherDate" th:value="${today}"
+							class="w-full border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition">
+					</div>
+					<div class="relative">
+						<label class="block text-sm font-medium text-gray-700 mb-1">From </label>
+						<select id="fromLedger"
+							class="w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400">
+							<option value="">Choose Ledger</option>
+						</select>
+					</div>
+					<div class="relative">
+						<label class="block text-sm font-medium text-gray-700 mb-1">To</label>
+						<select id="toLedger"
+							class="w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400">
+							<option value="">Choose Ledger</option>
+						</select>
+					</div>
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+						<input type="text" id="voucherAmount"
+							class="w-full border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition">
+					</div>
+					<div class="flex items-end">
+						<button class="save-btn" id="saveUpdateAccountLedger">Save</button>
+						<button class="cancel-btn" onclick="location.reload()">Cancel</button>
+					</div>
+				</div>
+				<div class=" mt-2">
+					<div class="errorAppendArea"></div>
+				</div>
+				<div class="mt-4">
+					<button id="toggleAccordion"
+						class="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-md shadow border hover:bg-gray-200 transition flex justify-between items-center">
+						<span>More Details</span>
+						<span id="arrow" class="transition-transform">&#9662;</span>
+					</button>
+				</div>
+
+				<div id="accordionContent"
+					class="hidden mt-4 grid grid-cols-5 gap-6 bg-gray-50 p-4 rounded-lg border shadow-sm">
+
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-1">Reference No</label>
+						<input type="text" id="referenceNo"
+							class="w-full border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition">
+					</div>
+
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-1">Reference Date</label>
+						<input type="date" id="referenceDate"
+							class="w-full border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition">
+					</div>
+
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-1">Remark</label>
+						<input type="text" id="remark"
+							class="w-full border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition">
+					</div>
+				</div>
+
+				<div class="mt-2 rounded-lg border shadow-sm relative">
+
+					<div id="tableLoader"
+						class="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center hidden z-10">
+						<div class="h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin">
+						</div>
+					</div>
+					<div class="bg-gray-50 p-4">
+						<div class="flex justify-end gap-3 items-end">
+
+							<div>
+								<label class="block text-sm font-medium text-gray-700 mb-1">From</label>
+								<input type="date" id="fromDate" th:value="${today}" class="w-40 border border-gray-300 rounded-lg px-3 py-2 shadow-sm
+				                           focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition">
+							</div>
+
+							<div>
+								<label class="block text-sm font-medium text-gray-700 mb-1">To</label>
+								<input type="date" id="toDate" th:value="${today}" class="w-40 border border-gray-300 rounded-lg px-3 py-2 shadow-sm
+				                           focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition">
+							</div>
+
+							<div>
+								<button id="searchVoucherPayments" class="search-btn px-5 py-2 h-[42px]">
+									Search
+								</button>
+							</div>
+
+						</div>
+					</div>
+
+					<div class="mt-2">
+						<table id="voucherListTable" class="app-table table-no-wrap">
+							<thead></thead>
+							<tbody></tbody>
+							<tfoot></tfoot>
+						</table>
+					</div>
+
+					<div class="mt-2 px-3">
+						<div id="pagination"></div>
+					</div>
+				</div>
+
+
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<div layout:fragment="scripts">
+	<script th:src="@{/assets/lib/simplepagination/simplePagination.min.js}"></script>
+	<script th:src="@{/assets/modules/account/voucher.js}"></script>
+</div>
+
+
+
+
+
+
+
+</html>

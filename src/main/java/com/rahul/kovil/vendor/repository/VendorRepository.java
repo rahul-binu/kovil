@@ -1,0 +1,17 @@
+package com.rahul.kovil.vendor.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.rahul.kovil.common.enums.VendorType;
+import com.rahul.kovil.vendor.entity.Vendor;
+
+@Repository
+public interface VendorRepository extends JpaRepository<Vendor, Long>{
+
+	List<Vendor> findByTypeAndFullNameContainingIgnoreCaseOrTypeAndMobileContainingIgnoreCaseOrTypeAndFamilyNameContainingIgnoreCase(
+	        VendorType type1, String name, VendorType type2, String mobile, VendorType type3, String familyName);
+
+}

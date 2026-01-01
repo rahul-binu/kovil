@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/app.html}">
+
+<th:block layout:fragment="head">
+	<title>Dashboard</title>
+</th:block>
+
+<div layout:fragment="content" class="p-4">
+
+	<link rel="stylesheet" th:href="@{/assets/lib/pagination/pagination.css}" />
+
+	<div
+		class="overflow-x-auto mt-2 bg-neutral-primary-soft block border border-default border-t-4 rounded-base shadow-xs">
+
+		<div class="flex items-center my-10">
+			<div class="flex-grow border-b-2 border-blue-500"></div>
+			<span class="px-4 text-2xl font-bold text-gray-800">Stock Transaction</span>
+			<div class="flex-grow border-b-2 border-blue-500"></div>
+		</div>
+
+		<div class="flex items-center justify-between mx-2 mb-3">
+			<div class="flex items-end gap-4">
+				<div>
+					<label class="block text-sm font-medium text-gray-700">From</label>
+					<input type="date" th:value="${date}" id="fromDate"
+						class="w-64 mt-1 border rounded-lg px-3 py-2 focus:ring focus:ring-indigo-300">
+				</div>
+				<div>
+					<label class="block text-sm font-medium text-gray-700">To</label>
+					<input type="date" th:value="${date}" id="toDate"
+						class="w-64 mt-1 border rounded-lg px-3 py-2 focus:ring focus:ring-indigo-300">
+				</div>
+				<button class="search-btn mt-6" id="searchBtn">Search</button>
+			</div>
+			<div class="flex gap-3">
+				<button class="excel-btn" id="excelExportVendor">Export Excel</button>
+				<button class="print-btn" id="htmlPrinttTable">Print</button>
+			</div>
+		</div>
+
+
+		<div class="relative">
+
+			<div id="tableLoader"
+				class="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center hidden z-10">
+				<div class="h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin">
+				</div>
+			</div>
+
+			<div id="pagination">
+				<table class="app-table" id="stockTable">
+					<thead></thead>
+					<tbody></tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+
+<div layout:fragment="scripts">
+	<script th:src="@{/assets/lib/excel/exceljs.min.js}"></script>
+	<script th:src="@{/assets/lib/excel/common.js}"></script>
+	<script th:src="@{/assets/lib/pagination/pagination.js}"></script>
+
+	<script th:src="@{/assets/modules/reports/common.js}"></script>
+	<script th:src="@{/assets/modules/inventory/stock_transaction.js}"></script>
+</div>
+
+</html>

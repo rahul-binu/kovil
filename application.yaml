@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: kovil
+
+#  security:
+#    user:
+#      name: admin
+#      password: admin
+#
+#  datasource:
+#    url: jdbc:mysql://localhost:3306/kovil?serverTimezone=Asia/Kolkata
+#    username: root
+#    password:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
+#    properties:
+#      hibernate:
+#        format_sql: true
+#    defer-datasource-initialization: true
+#  sql:
+#    init:
+#      mode: always
+
+  datasource:
+    url: jdbc:h2:file:./data/kovil-db
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    defer-datasource-initialization: true
+
+#  sql:
+#    init:
+#      mode: always
+
+  h2:
+    console:
+      enabled: true
+      path: /web/h2
+    
+
+server:
+  port: 8090
+
+app:
+  crossorigin:
+    url: http://localhost:3000
+
+  constants:
+    jwt:
+      header: Authorization
+      provider: rahulbinu220@gmail.com
+      secretkey: 1234567890qwertyuiopasdfghjklzxcvbnm

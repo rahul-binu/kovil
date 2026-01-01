@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ml">
+
+<head>
+	<meta charset="utf-8">
+	<title>Receipt Print — Browser & Thermal</title>
+	<style>
+		@page {
+			size: A4;
+			margin: 0;
+		}
+
+		/* default for browser print */
+
+		/* Common */
+		body {
+			margin: 0;
+			padding: 10px;
+			font-family: "Noto Sans Malayalam", sans-serif;
+		}
+
+		.center {
+			text-align: center;
+		}
+
+		img.logo {
+			display: block;
+			margin: 6px auto;
+		}
+
+		/* Single receipt for browser print (A4) */
+		#page-a4 {
+			/*display: none;*/
+		}
+
+		.a4-wrapper {
+			width: 210mm;
+			margin: 0 auto;
+			box-sizing: border-box;
+			padding: 12mm;
+		}
+
+		.a4-receipt {
+			height: 99mm;
+			border: 1px dashed #000;
+			padding: 3px;
+			box-sizing: border-box;
+			margin-bottom: 6px;
+		}
+
+		/* Thermal receipt base */
+		#receipt {
+			padding: 6px;
+			box-sizing: border-box;
+			background: transparent;
+		}
+
+		/* Modes: 58mm and 80mm */
+		.receipt-58 {
+			width: 58mm;
+			font-size: 13px;
+		}
+
+		.receipt-80 {
+			width: 80mm;
+			font-size: 15px;
+		}
+
+		.center {
+			text-align: center;
+		}
+
+		.title {
+			font-weight: 700;
+			font-size: 1.05em;
+			line-height: 1.1;
+		}
+
+		.subtitle {
+			display: inline-block;
+			border-top: 1px dashed #000;
+			border-bottom: 1px dashed #000;
+			padding: 2px 6px;
+			margin-top: 6px;
+			font-weight: 700;
+		}
+
+		.row {
+			margin-top: 6px;
+		}
+
+		.label {
+			display: inline-block;
+			width: 60px;
+			font-weight: 700;
+			vertical-align: top;
+		}
+
+		.amount {
+			margin-top: 10px;
+			font-weight: 700;
+			font-size: 1.1em;
+		}
+
+		.footer {
+			text-align: right;
+			margin-top: 10px;
+		}
+
+		/* Rotation helper (non-print only) */
+		.rotate-vertical {
+			transform: rotate(90deg);
+			transform-origin: top left;
+			position: absolute;
+			left: 58mm;
+			top: 0;
+		}
+
+		/* Print helpers */
+		@media print {
+			body {
+				padding: 0;
+			}
+
+			#controls {
+				display: none;
+			}
+
+			#page-a4 {
+				display: block;
+			}
+		}
+
+		/* Other styles */
+		.hidden {
+			display: none !important;
+		}
+
+		.controls-label {
+			display: block;
+			margin-top: 12px;
+		}
+
+		/* html style*/
+
+		.html-page-wrapper {
+			width: 210mm;
+			height: 297mm;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.html-receipt {
+			height: 99mm;
+			/* 3 receipts per page */
+			width: 100%;
+			box-sizing: border-box;
+			padding: 10mm;
+			border-bottom: 1px dashed #000;
+		}
+
+		.html-box {
+			border: 2px solid #000;
+			padding: 10px;
+			height: 100%;
+			position: relative;
+		}
+
+		.html-header {
+			text-align: center;
+			font-weight: bold;
+			font-size: 18px;
+			line-height: 1.4;
+		}
+
+		.html-logo {
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			width: 40px;
+		}
+
+		.html-sub-title {
+			background: #002d88;
+			color: white;
+			display: inline-block;
+			padding: 2px 8px;
+			margin-top: 5px;
+			font-size: 14px;
+			border-radius: 3px;
+		}
+
+		.html-row {
+			margin-top: 12px;
+			font-size: 16px;
+		}
+
+		.html-field label {
+			display: inline-block;
+			width: 80px;
+		}
+
+		.html-field .html-line {
+			display: inline-block;
+			width: 70%;
+			border-bottom: 1px dotted #000;
+			padding-bottom: 2px;
+		}
+
+		.html-amount-box {
+			position: absolute;
+			bottom: 15px;
+			left: 10px;
+			font-size: 18px;
+			font-weight: bold;
+		}
+
+		.html-treasurer {
+			position: absolute;
+			bottom: 15px;
+			right: 20px;
+			font-size: 16px;
+		}
+
+		.html-red {
+			color: red;
+			font-weight: bold;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="layout-container" style="display:flex; height:100vh; overflow:hidden; font-family: sans-serif;">
+
+		<!-- Controls -->
+		<div id="controls"
+			style="width:300px; min-width:280px; background:rgb(153, 193, 241); border-right:1px solid #ccc; padding:15px; overflow-y:auto;">
+
+			<h3 style="margin-top:0;">🛠 Print Settings</h3>
+			<label class="controls-label">Printer width:
+				<select id="widthSelect">
+					<option value="58">58 mm</option>
+					<option value="80">80 mm</option>
+				</select>
+			</label>
+
+			<label class="controls-label">
+				Height (mm): <input id="heightInput" type="number" value="110" style="width:80px">
+			</label>
+
+			<label class="controls-label">
+				<input id="rotateToggle" type="checkbox"> Rotate 90°
+			</label>
+
+			<button class="controls-label" onclick="applyAndPreview()">Apply</button>
+			<button class="controls-label" onclick="printBrowser()">Print (Browser)</button>
+			<button class="controls-label" onclick="printThermalQZ()">Print (Thermal via QZ Tray)</button>
+			<button class="controls-label" onclick="printThermalWebUSB()">Print (Thermal via WebUSB - demo)</button>
+		</div>
+
+		<!-- Browser A4 preview (single receipt layout, visible in print) -->
+		<div id="page-a4">
+			<div class="a4-wrapper">
+				<div class="html-receipt">
+					<div class="html-box">
+						<img src="/images/logo.png" class="html-logo receipt-logo-image">
+
+						<div class="html-header">
+							ശ്രീ പ്രാഞ്ചേരി കണ്‍സ്ടണ്‍ ശാസ്താ ക്ഷേത്രം<br>
+							എസ്.ടി മക്കാട്<br>
+							<span class="sub-title">നിരാഞ്ജനം രസീത്</span>
+						</div>
+
+						<div class="html-row html-field">
+							<label>നമ്പർ:</label>
+							<span class="html-red receiptNo">0</span>
+							<span style="float:right;">തീയതി: <span class="receiptDate">00/00/0000</span></span>
+						</div>
+
+						<div class="html-row html-field">
+							<label>പേര്:</label>
+							<span class="html-line devoteeName"></span>
+						</div>
+
+						<div class="html-row html-field">
+							<label>വിലാസം:</label>
+							<span class="html-line devoteeAddress"></span>
+						</div>
+
+						<div class="html-row html-field">
+							<label>നക്ഷത്രം:</label>
+							<span class="html-line devoteeNashatra"></span>
+						</div>
+
+						<div class="html-amount-box devoteeAmount">Rs. 50/-</div>
+						<div class="html-treasurer">Treasurer</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Thermal receipt preview -->
+		<div id="receipt" class="receipt-58 thermal-print-block" style="position:relative">
+			<div class="center">
+				<img class="receipt-logo-image" id="logo" src="/images/logo.png" alt="logo" style="width:40px">
+				<div class="title">ശ്രീ പ്രാഞ്ചേരി കണ്‍സ്ടണ്‍ ശാസ്താ ക്ഷേത്രം<br>എസ്. ടി മക്കാട്</div>
+				<div class="subtitle">നിരാഞ്ജനം രസീത്</div>
+			</div>
+
+			<div class="row"><span class="label">നമ്പർ:</span> <strong class="receiptNo">0</strong></div>
+			<div class="row"><span class="label">തീയതി:</span> <span class="receiptDate">00/00/0000</span></div>
+			<div class="row"><span class="label">പേര്:</span> <span class="devoteeName"></span></div>
+			<div class="row"><span class="label">വിലാസം:</span> <span class="devoteeAddress"></span></div>
+			<div class="row"><span class="label">നക്ഷത്രം:</span> <span class="devoteeNashatra"></span></div>
+			<div class="amount">Rs. <span class="devoteeAmount">0</span>/-</div>
+			<div class="footer">Treasurer</div>
+		</div>
+
+	</div>
+
+	<script>
+		/* ====== Helpers to change width/height/rotation ====== */
+		function applyThermalSettings(widthMM, heightMM, rotate) {
+			// apply @page for print dialog
+			const existing = document.getElementById('dynamic-page-style');
+			if (existing) existing.remove();
+
+			const st = document.createElement('style');
+			st.id = 'dynamic-page-style';
+			st.innerHTML = `@page { size: ${widthMM}mm auto; margin:0; }`;
+			document.head.appendChild(st);
+
+			const r = document.getElementById('receipt');
+			r.classList.remove('receipt-58', 'receipt-80');
+			r.classList.add(widthMM === 58 ? 'receipt-58' : 'receipt-80');
+
+			r.style.width = (widthMM === 58 ? '58mm' : '80mm');
+			r.style.minHeight = heightMM + 'mm';
+
+			// rotation
+			if (rotate) {
+				r.classList.add('rotate-vertical');
+				// for rotated layout, swap width => left offset
+				r.style.left = widthMM + 'mm';
+				// virtual content width (height after rotation)
+				r.style.width = heightMM + 'mm';
+			} else {
+				r.classList.remove('rotate-vertical');
+				r.style.left = '0';
+				r.style.width = (widthMM === 58 ? '58mm' : '80mm');
+			}
+
+			// logo size tweak
+			const logo = document.getElementById('logo');
+			if (widthMM === 58) logo.style.width = '40px';
+			else logo.style.width = '56px';
+		}
+
+		/* called by UI button */
+		function applyAndPreview() {
+			const width = Number(document.getElementById('widthSelect').value);
+			const height = Number(document.getElementById('heightInput').value) || 110;
+			const rotate = document.getElementById('rotateToggle').checked;
+			applyThermalSettings(width, height, rotate);
+		}
+
+		/* Browser print - simple */
+		function printBrowser() {
+			// Hide thermal blocks during browser print
+			document.querySelectorAll('.thermal-print-block').forEach(el => {
+				el.classList.add("hidden");
+			});
+			window.print();
+			document.querySelectorAll('.thermal-print-block').forEach(el => {
+				el.classList.remove("hidden");
+			});
+		}
+
+		/* ====== Thermal: Browser-side printing (QZ Tray example) ======
+		  NOTE: QZ Tray is a popular cross-browser/OS solution for sending raw ESC/POS to printers
+		  1) Include qz-tray.js from QZ and have QZ Tray app installed on client machine.
+		  2) This function builds a raster image from the receipt DOM (recommended for Malayalam),
+			 then sends the image to the printer via QZ Tray.
+		===== */
+		async function printThermalQZ() {
+			if (typeof qz === 'undefined') {
+				alert('QZ Tray library not found. Install QZ Tray and include qz-tray.js');
+				return;
+			}
+
+			try {
+				// 1) render receipt DOM to canvas (raster) using html2canvas (or similar)
+				// (we show an example using html2canvas; include it in your page when using QZ)
+				const receiptNode = document.getElementById('receipt');
+				// If you don't have html2canvas, include it: https://html2canvas.hertzen.com/dist/html2canvas.min.js
+				const canvas = await html2canvas(receiptNode, {scale: 2});
+				const dataUrl = canvas.toDataURL('image/png');
+
+				// 2) convert dataUrl -> binary for QZ
+				const raw = atob(dataUrl.split(',')[1]);
+				const rawArray = new Uint8Array(raw.length);
+				for (let i = 0; i < raw.length; i++) rawArray[i] = raw.charCodeAt(i);
+
+				// 3) Connect and send via qz
+				await qz.websocket.connect();
+				const config = qz.configs.create('YOUR_PRINTER_NAME'); // replace with actual printer name
+
+				// QZ supports print of image via data URI as well:
+				const img = [{type: 'image', format: 'png', data: dataUrl}];
+				await qz.print(config, img);
+
+				// optionally cut (some printers support cut command)
+				// qz.print(config, [{ type:'raw', format:'command', data: '\x1D\x56\x41\x10' }]);
+
+				qz.websocket.disconnect();
+				alert('Sent to printer via QZ Tray');
+			} catch (e) {
+				console.error(e);
+				alert('QZ printing failed: ' + e);
+			}
+		}
+
+		/* ====== Thermal: WebUSB (experimental) ======
+		  WebUSB is limited: not all browsers/printers work. This is a minimal skeleton.
+		  You will need to know your printer's USB vendor/product id and endpoints.
+		  Use this only if you want to control USB directly from the browser.
+		*/
+		async function printThermalWebUSB() {
+			try {
+				const device = await navigator.usb.requestDevice({filters: [] /* add filters if desired */});
+				await device.open();
+				if (device.configuration === null) await device.selectConfiguration(1);
+				await device.claimInterface(0);
+
+				// Convert receipt to PNG (as above) and send bitmap bytes in ESC/POS raster format.
+				// Converting PNG -> ESC/POS raster bytes is non-trivial; better send raw text if
+				// your printer supports UTF-8 (rare for Malayalam).
+				alert('WebUSB connected. Implement raster conversion on client for reliable Malayalam output.');
+				await device.close();
+			} catch (err) {
+				console.error(err);
+				alert('WebUSB failed: ' + err);
+			}
+		}
+
+		/* ====== Simple demo defaults ====== */
+		document.addEventListener('DOMContentLoaded', function () {
+			applyThermalSettings(58, 110, false);
+			setPrintData();
+		});
+	</script>
+
+	<!-- include html2canvas if you plan to use QZ Tray image sending:
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+Include QZ Tray's qz-tray.js when using QZ: https://qz.io/download/ -->
+
+	<script>
+
+		function setPrintData() {
+			document.querySelectorAll('.receipt-logo-image').forEach(el => {
+				el.src = "/dynamic/assets/app_images/default_images/ayyappan_logo.webp";
+			});
+
+		}
+
+	</script>
+</body>
+
+</html>
