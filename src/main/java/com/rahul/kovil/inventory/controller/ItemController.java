@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rahul.kovil.common.dto.InvConversionUnitDto;
 import com.rahul.kovil.common.dto.InvItemDto;
 import com.rahul.kovil.common.response.ApiResponse;
 import com.rahul.kovil.config.JwtProvider;
@@ -60,6 +60,11 @@ public class ItemController {
 	}
 	
 	
+	@GetMapping("/unit-convertions")
+	public ResponseEntity<List<InvConversionUnitDto>> getMethodName(@RequestHeader("Authorization") String token) {
+		String tenantId = jwt.getTenantId(token);
+		return ResponseEntity.ok(itemService.getUnitConversions(tenantId));
+	}
 	
 	
 	

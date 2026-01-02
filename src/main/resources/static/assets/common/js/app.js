@@ -168,6 +168,26 @@ function mapArrWithAField(a, f) {
 	return ar;
 }
 
+function mapArrWithAFieldToObjArr(arr, key) {
+	const result = {};
+
+	if (!Array.isArray(arr)) return result;
+
+	arr.forEach(obj => {
+		const k = obj[key];
+		if (!k) return;
+
+		if (!result[k]) {
+			result[k] = [];
+		}
+
+		result[k].push(obj);
+	});
+
+	return result;
+}
+
+
 function mapToFields(flds, arr) {
 	if (!flds || !arr || flds.length === 0 || arr.length === 0) {
 		return [];
@@ -326,15 +346,6 @@ function actionIcons(id, rowName, isEdit = true, isDel = true) {
 				</svg>
 			</button>
 		` : `
-			<button class="action-btn edit disabled" title="Edit Disabled" aria-label="Edit Disabled">
-				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="color:#bfbfbf;">
-					<path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" 
-						stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-					<path d="M20.71 7.04a1 1 0 0 0 0-1.41L18.37 3.29a1 1 0 0 0-1.41 0l-1.83 1.83 
-						3.75 3.75 1.83-1.83z" 
-						stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-				</svg>
-			</button>
 		`}
 
 		<!-- DELETE BUTTON -->
@@ -351,17 +362,6 @@ function actionIcons(id, rowName, isEdit = true, isDel = true) {
 				</svg>
 			</button>
 		` : `
-			<button class="action-btn delete disabled" title="Delete Disabled" aria-label="Delete Disabled">
-				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="color:#bfbfbf;">
-					<path d="M3 6h18" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-					<path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" 
-						stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-					<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" 
-						stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-					<path d="M10 11v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-					<path d="M14 11v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-				</svg>
-			</button>
 		`}
 	</div>
 	`;

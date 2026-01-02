@@ -269,3 +269,10 @@ VALUES (
 );
 
 
+INSERT INTO inv_unit_conversions (from_unit, to_unit, multiplier, tenant_id) VALUES
+('KG', 'G', 1000, '-1'),
+('G', 'KG', 0.001, '-1'),
+('L', 'ML', 1000, '-1'),
+('ML', 'L', 0.001, '-1');
+
+

@@ -2,6 +2,7 @@ package com.rahul.kovil.inventory.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +60,7 @@ public class StockTransactionService {
 	}
 
 	@Transactional
-	public ApiResponse deleteStock(Long id) {
+	public ApiResponse deleteStockTransEntry(Long id) {
 
 		StockTransaction stock = stockTransactionRepository.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException("Stock not found with id: " + id));
@@ -101,11 +102,11 @@ public class StockTransactionService {
 		Map<String, ToonResponse> res = new HashMap<>();
 
 		LocalDateTime fromDate = LocalDate.parse(from).atStartOfDay();
-		LocalDateTime toDate  = LocalDate.parse(to).atStartOfDay();
+		LocalDateTime toDate  = LocalDate.parse(to).atTime(LocalTime.MAX);
 
 		List<Object[]> stockTransData = stockTransactionRepository.findStockTransactionBetweenTransactionDateAndTenantId(fromDate, toDate,
 				List.of(tenantId, TenantConstants.GLOBAL_TENANT), List.of(BaseStatus.ACTIVE));
-		List<String> stockTransLabels = List.of("item", "stkDir", "transTyp", "quantity", "transUnit", "unitMul", "remark", "transDt");
+		List<String> stockTransLabels = List.of("id","item", "stkDir", "transTyp", "quantity", "transUnit", "unitMul", "remark", "transDt");
 //		"s.item, s.stockDirection, s.transactionType, s.quantity, s.transactionUnit, s.unitMultiplier, s.remarks, s.transactionDate";
 		ToonResponse stock = ToonResponse.builder().status("succes").message("Stock transaction")
 				.data(stockTransData).label(stockTransLabels).build();

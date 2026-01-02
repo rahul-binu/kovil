@@ -18,7 +18,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "inv_unit_conversions", uniqueConstraints = @UniqueConstraint(columnNames = { "fromUnit", "toUnit" }))
+@Table(name = "inv_unit_conversions", uniqueConstraints = @UniqueConstraint(columnNames = { "from_unit", "to_unit" }))
 public class UnitConversion extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

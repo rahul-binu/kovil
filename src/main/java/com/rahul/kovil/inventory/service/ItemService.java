@@ -8,12 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.rahul.kovil.common.dto.InvConversionUnitDto;
 import com.rahul.kovil.common.dto.InvItemDto;
 import com.rahul.kovil.common.enums.BaseStatus;
 import com.rahul.kovil.common.response.ApiResponse;
 import com.rahul.kovil.config.TenantConstants;
 import com.rahul.kovil.inventory.entity.Item;
+import com.rahul.kovil.inventory.entity.UnitConversion;
 import com.rahul.kovil.inventory.repository.ItemRepository;
+import com.rahul.kovil.inventory.repository.UnitConversionRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -25,9 +28,11 @@ public class ItemService {
 	private ModelMapper modelMapper;
 
 	private final ItemRepository itemRepository;
-
-	public ItemService(ItemRepository itemRepository) {
+	private final UnitConversionRepository unitConversionRepository;
+	
+	public ItemService(ItemRepository itemRepository, UnitConversionRepository unitConversionRepository) {
 		this.itemRepository = itemRepository;
+		this.unitConversionRepository = unitConversionRepository;
 	}
 
 	@Transactional
@@ -70,6 +75,11 @@ public class ItemService {
 				BaseStatus.ACTIVE);
 
 		return ApiResponse.builder().status(HttpStatus.OK).message(exists + "").timestamp(LocalDateTime.now()).build();
+	}
+
+	public List<InvConversionUnitDto> getUnitConversions(String tenantId) {
+		List<UnitConversion> units = unitConversionRepository.findByTenantIdIn(List.of(tenantId ,TenantConstants.GLOBAL_TENANT));
+		return units.stream().map(u->modelMapper.map(u, InvConversionUnitDto.class)).toList();
 	}
 
 }

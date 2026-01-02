@@ -200,7 +200,6 @@ $('#htmlPrintVendor').click(function() {
 });
 
 async function deleteItemRow(id) {
-	console.log(id)
 
 	try {
 		const response = await fetch("/api/inv/item/" + id, {

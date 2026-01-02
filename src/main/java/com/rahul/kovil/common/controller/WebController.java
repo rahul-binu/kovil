@@ -164,6 +164,10 @@ public class WebController {
 	@GetMapping("/inventory/stock-transaction")
 	public String stockTransaction(Model model) {
 		model.addAttribute("date", LocalDate.now());
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+		model.addAttribute("dateTime", LocalDateTime.now().format(formatter));
+		model.addAttribute("transType", ItemTransactionType.values());
+		model.addAttribute("utype", ItemUnitType.values());
 		return "modules/inventory/stock_transaction";
 	}
 	

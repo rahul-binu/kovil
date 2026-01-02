@@ -496,21 +496,45 @@
 	margin-bottom: 10px;
 }
 
+.main-message-body {
+	padding-right: 2em;
+}
+
 .main-message-content {
 	font-size: 14px;
+	word-wrap: break-word;
+	word-break: break-word;
+	overflow-wrap: anywhere;
+	white-space: normal;
 }
 
 .close-main-message {
 	position: absolute;
-	top: 10px;
-	right: 10px;
+	top: 0;
+	right: 0;
+	height: 100%;
+	width: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	cursor: pointer;
+	background: transparent;
+	z-index: 2;
 }
 
-.close-main-message .icon {
+.close-main-message span {
 	font-size: 18px;
 }
 
+.main-success-message .close-main-message {
+	background-color: rgb(157, 209, 144);
+	color: rgb(0, 0, 0);
+}
+
+.main-error-message .close-main-message {
+	background-color: rgb(255, 204, 204);
+	color: rgb(0, 0, 0);
+}
 
 
 /* Excel Button - One Class Only */
@@ -927,6 +951,7 @@
 	background-color: rgb(255, 204, 204);
 	cursor: not-allowed;
 }
+
 .no-drop-color {
 	background-color: rgb(255, 204, 204);
 }
@@ -1125,20 +1150,10 @@
 
 
 /* table */
-table .ruppie-align{
+table .ruppie-align {
 	text-align: right !important;
 }
 
-table .action-col{
+table .action-col {
 	text-align: center !important;
 }
-
-
-
-
-
-
-
-
-
-

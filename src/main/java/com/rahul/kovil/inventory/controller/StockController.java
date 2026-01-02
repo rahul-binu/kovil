@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rahul.kovil.common.dto.InvStockDto;
+import com.rahul.kovil.common.response.ApiResponse;
 import com.rahul.kovil.common.response.ToonResponse;
 import com.rahul.kovil.config.JwtProvider;
 import com.rahul.kovil.inventory.service.StockTransactionService;
@@ -30,7 +32,7 @@ public class StockController {
 	
 	public StockController(StockTransactionService stockTransactionService) {
 		this.stockTransactionService = stockTransactionService;
-	}
+	}	
 	
 	@PostMapping("")
 	public ResponseEntity<InvStockDto> insertStock(@RequestHeader("Authorization") String token, @RequestBody InvStockDto stock){	
@@ -43,6 +45,11 @@ public class StockController {
 	public ResponseEntity<Map<String, ToonResponse>> getCurrentStock(@RequestHeader("Authorization") String token, @PathVariable String date) {
 		String tenantId = jwt.getTenantId(token);
 		return ResponseEntity.ok(stockTransactionService.getCurrentStock(tenantId, date));
+	}
+	
+	@DeleteMapping("/{id}")
+	public ResponseEntity<ApiResponse> deleteStockTransEntry(@PathVariable Long id){
+		return ResponseEntity.ok(stockTransactionService.deleteStockTransEntry(id));
 	}
 	
 	@GetMapping("/all-transactions")

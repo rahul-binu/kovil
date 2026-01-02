@@ -53,7 +53,7 @@ public interface StockTransactionRepository extends JpaRepository<StockTransacti
 			List<BaseStatus> status);
 
 	@Query("""
-			SELECT s.item, s.stockDirection, s.transactionType, s.quantity, s.transactionUnit, s.unitMultiplier, s.remarks, s.transactionDate
+			SELECT s.id, s.item, s.stockDirection, s.transactionType, s.quantity, s.transactionUnit, s.unitMultiplier, s.remarks, s.transactionDate
 			FROM StockTransaction s
 			WHERE s.transactionDate >= :fromDate
 			  AND s.transactionDate <= :toDate
