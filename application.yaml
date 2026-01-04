@@ -60,3 +60,7 @@ app:
       header: Authorization
       provider: rahulbinu220@gmail.com
       secretkey: 1234567890qwertyuiopasdfghjklzxcvbnm
+
+client:
+  name: YOUR COMPANY NAME
+  address: "My Company Address"

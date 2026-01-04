@@ -67,14 +67,14 @@ function openUniversalConfirmModal(options = {}) {
 		.fadeIn(150);
 }*/
 function openUniversalConfirmModal(options = {}) {
-    $("#universalConfirmHead").text(options.title || "Are you sure?");
-    $("#universalConfirmText").text(options.message || "You are about to perform this action.");
-    $("#universalConfirmBtn").text(options.actionText || "Confirm");
+	$("#universalConfirmHead").text(options.title || "Are you sure?");
+	$("#universalConfirmText").text(options.message || "You are about to perform this action.");
+	$("#universalConfirmBtn").text(options.actionText || "Confirm");
 
-    // Wrap callback with args
-    universalCallback = () => options.onConfirm?.(...(options.args || []));
+	// Wrap callback with args
+	universalCallback = () => options.onConfirm?.(...(options.args || []));
 
-    $("#universalConfirmModal").addClass("show").fadeIn(150);
+	$("#universalConfirmModal").addClass("show").fadeIn(150);
 }
 
 // click function
@@ -225,22 +225,22 @@ function mapToFieldsWithKey(fld, flds, arr) {
 }
 
 function mapToFieldsGrouped(keyField, labels, data) {
-    const map = {};
+	const map = {};
 
-    data.forEach(row => {
-        const obj = {};
-        labels.forEach((label, i) => {
-            obj[label] = row[i];
-        });
+	data.forEach(row => {
+		const obj = {};
+		labels.forEach((label, i) => {
+			obj[label] = row[i];
+		});
 
-        const key = obj[keyField];
-        if (!map[key]) {
-            map[key] = [];
-        }
-        map[key].push(obj);
-    });
+		const key = obj[keyField];
+		if (!map[key]) {
+			map[key] = [];
+		}
+		map[key].push(obj);
+	});
 
-    return map;
+	return map;
 }
 
 
@@ -329,7 +329,7 @@ function focusNext() {
 
 
 
-function actionIcons(id, rowName, isEdit = true, isDel = true) {
+function actionIcons(id, rowName, isEdit = true, isDel = true, idPrint = false) {
 
 	return `
 	<div class="action-icons" data-id="${id}">
@@ -363,6 +363,23 @@ function actionIcons(id, rowName, isEdit = true, isDel = true) {
 			</button>
 		` : `
 		`}
+		
+		<!-- PRINT BUTTON -->
+		${idPrint ? `
+			<button class="action-btn print" title="Print" onclick="print${rowName}('${id}')" aria-label="Print">
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="text-green-600">
+				<path d="M6 9V4h12v5"
+					stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+				<path d="M6 17H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"
+					stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+				<path d="M6 14h12v6H6z"
+					stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+				<circle cx="18" cy="11" r="0.8" fill="currentColor"/>
+			</svg>
+			</button>
+			`
+			: `
+			`}
 	</div>
 	`;
 }
@@ -404,33 +421,33 @@ function mapToFieldsWithKey(fld, flds, arr) {
 }
 
 function formatDateTime(input) {
-	if(input==null || input=="") return "00-00-0000 00:00:00";
-    const date = new Date(input);
+	if (input == null || input == "") return "00-00-0000 00:00:00";
+	const date = new Date(input);
 
-    let dd = String(date.getDate()).padStart(2, '0');
-    let mm = String(date.getMonth() + 1).padStart(2, '0');
-    let yy = String(date.getFullYear());
+	let dd = String(date.getDate()).padStart(2, '0');
+	let mm = String(date.getMonth() + 1).padStart(2, '0');
+	let yy = String(date.getFullYear());
 
-    let hours = date.getHours();
-    let minutes = String(date.getMinutes()).padStart(2, '0');
-    let ampm = hours >= 12 ? 'PM' : 'AM';
+	let hours = date.getHours();
+	let minutes = String(date.getMinutes()).padStart(2, '0');
+	let ampm = hours >= 12 ? 'PM' : 'AM';
 
-    hours = hours % 12 || 12; // convert 0 → 12 and 13-23 → 1-11
-    hours = String(hours).padStart(2, '0');
+	hours = hours % 12 || 12; // convert 0 → 12 and 13-23 → 1-11
+	hours = String(hours).padStart(2, '0');
 
-    return `${dd}-${mm}-${yy} ${hours}:${minutes} ${ampm}`;
+	return `${dd}-${mm}-${yy} ${hours}:${minutes} ${ampm}`;
 }
 
 
 function formatDate(input) {
-	if(input==null || input=="") return "00-00-0000";
-    const date = new Date(input);
+	if (input == null || input == "") return "00-00-0000";
+	const date = new Date(input);
 
-    let dd = String(date.getDate()).padStart(2, '0');
-    let mm = String(date.getMonth() + 1).padStart(2, '0');
-    let yy = String(date.getFullYear());
+	let dd = String(date.getDate()).padStart(2, '0');
+	let mm = String(date.getMonth() + 1).padStart(2, '0');
+	let yy = String(date.getFullYear());
 
-    return `${dd}-${mm}-${yy}`;
+	return `${dd}-${mm}-${yy}`;
 }
 
 
@@ -439,14 +456,14 @@ function formatDate(input) {
 ############################################################################################################################*/
 function getTableHeader(head, act = true, actp = 2) {
 	let txt = '<tr>';
-	let i=0;
+	let i = 0;
 	head.forEach((e, i) => {
 		if (act && i == actp) {
 			txt += "<th>Actoin</th>";
 		}
 		txt += `<th>${e}</th>`;
 	});
-	if (act && i < actp && actp!= 2) {
+	if (act && i < actp && actp != 2) {
 		txt += "<th>Actoin</th>";
 	}
 	txt += '</tr>'
@@ -490,5 +507,15 @@ function printTableContent(table, header) {
 	}, 500);
 }
 
+function formatRupee(amount) {
+	if (amount == null || isNaN(amount)) return "0";
 
+	return new Intl.NumberFormat("en-IN").format(Number(amount));
+}
+
+
+function formatINR(amount) {
+	if (amount == null || isNaN(amount)) return "₹0";
+	return "₹" + Number(amount).toLocaleString("en-IN");
+}
 

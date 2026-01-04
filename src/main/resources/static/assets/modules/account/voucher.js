@@ -15,8 +15,8 @@ $(function() {
 	pageHeading = $("#voucherType").val().charAt(0).toUpperCase() + $("#voucherType").val().slice(1).toLowerCase()
 	$("#headdingType").text(pageHeading);
 	getAllLedgers();
-	
-	setTimeout(()=>{
+
+	setTimeout(() => {
 		getAllVoucherData();
 	}, 1000);
 })
@@ -77,11 +77,11 @@ function buildDropDowns() {
 	switch ($("#voucherType").val()) {
 		case "payment":
 			fromLedger = [...ledgerAssets];
-			toLedger   = [...ledgerExpense, ...ledgerAssets, ...ledgerLiability];
+			toLedger = [...ledgerExpense, ...ledgerAssets, ...ledgerLiability];
 			break;
 		case "receipt":
 			fromLedger = [...ledgerIncome, ...ledgerLiability];
-			toLedger   = [...ledgerAssets];
+			toLedger = [...ledgerAssets];
 			break;
 		case "contra":
 			fromLedger = [...ledgerAssets];
@@ -183,12 +183,11 @@ function saveVoucherEnrty() {
 	})
 		.then(res => res.json())
 		.then(data => {
-			if (data){
+			if (data) {
 				showMessage("Success", pageHeading + " entry is successfull", true);
-				setTimeout(()=>{
-					location.reload();
-				}, 300);
-			} else{
+				clearVoucherForm();
+				getAllVoucherData();
+			} else {
 				showMessage("Faild", "Something went wrong", false);
 			}
 			$(".clear-input").val('');
@@ -203,16 +202,16 @@ function saveVoucherEnrty() {
 
 function getAllVoucherData() {
 	$("#tableLoader").removeClass("hidden");
-		
+
 	let headers = ["#", "Type", "Date", "V.No", "From", "To", "Amount", "Ref No", "Ref Date", "Remark"];
 
 	$("#voucherListTable thead").html("<tr>" + buildReportHeaderRow(headers, false) + "<th>Action</th></tr>");
 
 	let fromDt = $("#fromDate").val();
 	let toDt = $("#toDate").val();
-	let vtyp= $("#voucherType").val().toUpperCase() + " VOUCHER";
+	let vtyp = $("#voucherType").val().toUpperCase() + " VOUCHER";
 	let url = `/api/account/voucher-payments/${fromDt}/${toDt}/${vtyp}`;
-	
+
 	fetch(url, {
 		method: "GET",
 		headers: {
@@ -222,7 +221,7 @@ function getAllVoucherData() {
 	})
 		.then(res => res.json())
 		.then(response => {
-			voucherPaymnetData = mapToFields(response.label ,response.data);
+			voucherPaymnetData = mapToFields(response.label, response.data);
 			paginateTable();
 		})
 		.catch(err => {
@@ -258,7 +257,7 @@ function buildReportHeaderRow(hed, tr = false) {
 	return thead;
 }
 
-function paginateTable(){
+function paginateTable() {
 	let filterdData = voucherPaymnetData;
 	$("#pagination").pagination({
 		items: filterdData.length,
@@ -273,19 +272,19 @@ function paginateTable(){
 	buildReportTableBody(filterdData, 0, itemsOnPage);
 }
 
-$("#searchVoucherPayments").click(function(){
+$("#searchVoucherPayments").click(function() {
 	getAllVoucherData();
 });
 
-function buildReportTableBody(data, s, l){
+function buildReportTableBody(data, s, l) {
 	let t = '';
 	const end = Math.min(s + l, data.length);
-	for(let i = s; i < end; i++){
+	for (let i = s; i < end; i++) {
 		let d = data[i];
-		let act = actionIcons(d.tid, "VoucherRow")
-		t+=`
+		let act = actionIcons(d.tid, "VoucherRow", false, true, true)
+		t += `
 		<tr>
-			<td>${i+1}</td>
+			<td>${i + 1}</td>
 			<td>${d.vt}</td>
 			<td>${formatDateTime(d.td ?? "")}</td>
 			<td>${d.vn}</td>
@@ -300,17 +299,133 @@ function buildReportTableBody(data, s, l){
 		`;
 	}
 	$("#voucherListTable tbody").html(t);
-	
+
 	$("#tableLoader").addClass("hidden");
 }
 
-function deleteVoucherRow(id){
-	console.log(id)
+function deleteVoucherRow(id) {
+
+	openUniversalConfirmModal({
+		title: "Delete Voucher",
+		message: "Are you sure you want to delete this voucher entry?",
+		actionText: "Delete",
+		onConfirm: () => confirmDeleteVoucherRow(id)
+	});
 }
 
-function editVoucherRow(id){
-	console.log(id)
+
+function confirmDeleteVoucherRow(id) {
+	if (!id) return;
+
+	fetch(`/api/account/voucher/${id}`, {
+		method: "DELETE",
+		headers: {
+			"Content-Type": "application/json",
+			"Authorization": "Bearer " + localStorage.getItem("jwtToken")
+		}
+	})
+		.then(response => {
+			if (!response.ok) {
+				throw new Error("Failed to delete stock");
+			}
+			return response.text();
+		})
+		.then(() => {
+			getAllVoucherData();
+		})
+		.catch(error => {
+			console.error(error);
+			showMessage("", "Unable to delete voucher. Please try again.", false);
+		});
 }
 
+function printVoucherRow(id) {
+	let data = voucherPaymnetData.filter(v => v.tid == id);
+	if (data.length === 0) {
+		alert("No voucher found!");
+		return;
+	}
+	let v = data[0]; // Single voucher
+	let tbltxt = `
+	<div style="font-family: 'Times New Roman', serif; width: 650px; margin: auto; color: #000; padding: 20px; border: 1px solid #000;">
+
+	    <!-- Header -->
+	    <div style="text-align: center; margin-bottom: 20px;">
+	        <h1 style="margin:0; font-size: 28px; letter-spacing: 1px;">${$("#clientName").val()}</h1>
+			<h4 style="margin:0; font-size: 20px; letter-spacing: 1px;">${$("#clientAddress").val()}</h4>
+	        <p style="margin:2px 0; font-size: 14px;">${$("#voucherDate").val()}</p>
+	        <p style="margin:2px 0; font-size: 12px;">Voucher ID: ${v.tid}</p>
+	    </div>
+
+	    <!-- Voucher Number -->
+	    <div style="text-align: center; margin-bottom: 20px;">
+	        <strong style="font-size: 16px;">Voucher Number: ${v.vn}</strong>
+	    </div>
+
+	    <!-- Transaction Details -->
+	    <div style="margin-bottom: 20px; line-height: 1.6;">
+	        <p><strong>Transaction Type:</strong> ${v.ty}</p>
+	        <p><strong>Voucher Type:</strong> ${v.vt}</p>
+	        <p><strong>Transaction Date:</strong> ${new Date(v.td).toLocaleString()}</p>
+	    </div>
+
+	    <!-- Ledger Details -->
+	    <div style="margin-bottom: 20px;">
+	        <strong>Account Details</strong>
+	        <div style="margin-top: 10px; line-height: 1.5;">
+			<p><strong>From Ledger:</strong> ${mappedLedgerData[v.cl]?.nm || "-"}</p>
+	            <p><strong>To Ledger:</strong> ${mappedLedgerData[v.dl]?.nm || "-"}</p>
+	        </div>
+	    </div>
+
+	    <!-- Amount & Remarks -->
+	    <div style="margin-bottom: 30px; line-height: 1.5;">
+	        <p><strong>Amount:</strong> <span style="font-size: 18px; font-weight: bold;">${v.am || "-"}</span></p>
+	        <p><strong>Reference No:</strong> ${v.rn || "-"}</p>
+			<p><strong>Reference Date:</strong> ${v.rd || "-"}</p>
+	        <p><strong>Remark:</strong> ${v.rm || "-"}</p>
+	    </div>
+
+	    <!-- Footer / Signatures -->
+	    <div style="display: flex; justify-content: space-between; margin-top: 40px; text-align: center;">
+	        <div>
+	            <p>Prepared By</p>
+	            <p>________________</p>
+	        </div>
+	        <div>
+	            <p>Checked By</p>
+	            <p>________________</p>
+	        </div>
+	        <div>
+	            <p>Authorized By</p>
+	            <p>________________</p>
+	        </div>
+	    </div>
+
+	    <!-- Optional Note -->
+	    <div style="text-align: center; margin-top: 30px; font-size: 12px;">
+	        <em>Note: This is a computer-generated voucher</em>
+	    </div>
+
+	</div>
+	`;
+
+
+
+	printTableContent(tbltxt, ""); // You can skip extra header since it's inside the div
+}
+
+function clearVoucherForm() {
+    $('#voucherAmount, #referenceNo, #referenceDate, #remark').val('');
+    $('#fromLedger, #toLedger').val('');
+
+    $('.errorAppendArea').empty();
+
+    const accordion = $('#accordionContent');
+    if (!accordion.hasClass('hidden')) {
+        accordion.addClass('hidden');
+        $('#arrow').css('transform', 'rotate(0deg)');
+    }
+}
 
 

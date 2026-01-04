@@ -204,7 +204,7 @@ public class AccountService implements AccountServiceApi {
 		String tid = SiteHelper.transId("vou");
 		TransactionDto trans = new TransactionDto(null, createdBy, voucher.getVtp() + " VOUCHER", 0L, voucher.getFml(),
 				voucher.getTol(), voucher.getAmt(), LocalDateTime.of(voucher.getVdt(), LocalTime.now()),
-				voucher.getRem(), type, TransactionStatus.ACTIVE, tid);
+				voucher.getRem(), type, TransactionStatus.ACTIVE, tid, voucher.getRed(), voucher.getRen());
 
 		TransactionDto savedTrans = saveTransaction(trans, tenantId, createdBy);
 		VoucherDto savedVoucher = new VoucherDto();
@@ -281,6 +281,12 @@ public class AccountService implements AccountServiceApi {
 		List<OpeningBalanceDto> openingDtos = openings.stream().map(o -> modelMapper.map(o, OpeningBalanceDto.class))
 				.toList();
 		return openingDtos;
+	}
+
+	public void softDeleteVoucher(String id, String tenantId) {
+		Transaction transaction = transactionRepository.findByTransId(id);
+		transaction.setStatus(TransactionStatus.CANCELLED);
+		transactionRepository.save(transaction);
 	}
 
 }

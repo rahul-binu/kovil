@@ -7,23 +7,127 @@
 </th:block>
 <div layout:fragment="content">
 
-	<input type="hidden" id="voucherType" th:value="${vtype}">
+	<style>
+		.light-text {
+			color: gray;
+		}
+		.bold-row {
+		    font-weight: bold !important;
+		    background-color: rgba(126, 168, 230, 0.25) !important;
+		}
+		
+	</style>
 
 	<div class="min-h-screen bg-gray-100 p-6">
 		<div class="">
-			<div class="flex items-center my-10">
-							<div class="flex-grow border-b-2 border-blue-500"></div>
-							<span class="px-4 text-2xl font-bold text-gray-800">DayBook</span>
-							<div class="flex-grow border-b-2 border-blue-500"></div>
-						</div>
-			<div class="bg-white rounded-xl shadow-lg p-8 mb-12 border border-gray-100">
 
-			
+			<!-- Header -->
+			<div class="flex items-center my-10">
+				<div class="flex-grow border-b-2 border-blue-500"></div>
+				<span class="px-4 text-2xl font-bold text-gray-800">DayBook</span>
+				<div class="flex-grow border-b-2 border-blue-500"></div>
+			</div>
+
+			<!-- Filters -->
+			<div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end mb-6">
+
+				<div class="flex flex-col">
+					<label class="text-sm font-medium text-gray-700 mb-1">From</label>
+					<input id="fromDate" type="date" th:value="${today}" class="border rounded-lg px-3 py-2">
+				</div>
+
+				<div class="flex flex-col">
+					<label class="text-sm font-medium text-gray-700 mb-1">To</label>
+					<input id="toDate" type="date" th:value="${today}" class="border rounded-lg px-3 py-2">
+				</div>
+
+				<div>
+					<button class="search-btn" id="searchButton">Search</button>
+				</div>
+
+				<div class="flex gap-3 justify-end">
+					<button class="print-btn" id="htmlPrintButton">Print</button>
+				</div>
 
 			</div>
 
+			<!-- Table Container -->
+			<div class="bg-white rounded-xl shadow-lg p-8 mb-12 border border-gray-100 max-h-[70vh] overflow-y-auto">
+				<div id="daybookTableAppendArea">
+					<table id="daybookTable" class="app-table">
+						<thead></thead>
+						<tbody></tbody>
+					</table>
+				</div>
+
+				<div class="w-full px-4 py-3 border-t border-b text-sm" id="daybookSummaryBlock">
+					<div class="grid grid-cols-8 gap-6 text-left">
+
+						<!-- CASH -->
+						<div>
+							<div class="font-semibold border-b mb-1">Cash Opening</div>
+							<div id="cashOpening" class="text-gray-700 font-medium">₹0</div>
+						</div>
+
+						<div>
+							<div class="font-semibold border-b mb-1">Cash Receipt</div>
+							<div id="cashReceipt" class="text-green-700 font-medium">₹0</div>
+						</div>
+
+						<div>
+							<div class="font-semibold border-b mb-1">Cash Payment</div>
+							<div id="cashPayment" class="text-red-700 font-medium">₹0</div>
+						</div>
+
+						<div>
+							<div class="font-semibold border-b mb-1">Cash Closing</div>
+							<div id="cashClosing" class="text-gray-800 font-semibold">₹0</div>
+						</div>
+
+						<!-- BANK -->
+						<div>
+							<div class="font-semibold border-b mb-1">Bank Opening</div>
+							<div id="bankOpeningDetails" class="text-gray-700"></div>
+							<div class="font-semibold mt-1 text-gray-800">
+								Total: <span id="bankOpeningTotal">₹0</span>
+							</div>
+						</div>
+
+						<div>
+							<div class="font-semibold border-b mb-1">Bank Receipt</div>
+							<div id="bankReceiptDetails" class="text-green-700"></div>
+							<div class="font-semibold mt-1 text-green-800">
+								Total: <span id="bankReceiptTotal">₹0</span>
+							</div>
+						</div>
+
+						<div>
+							<div class="font-semibold border-b mb-1">Bank Payment</div>
+							<div id="bankPaymentDetails" class="text-red-700"></div>
+							<div class="font-semibold mt-1 text-red-800">
+								Total: <span id="bankPaymentTotal">₹0</span>
+							</div>
+						</div>
+
+						<div>
+							<div class="font-semibold border-b mb-1">Bank Closing</div>
+							<div id="bankClosingDetails" class="text-gray-700"></div>
+							<div class="font-semibold mt-1 text-gray-800">
+								Total: <span id="bankClosingTotal">₹0</span>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+
+
+
 		</div>
 	</div>
+
+
 </div>
 
 <div layout:fragment="scripts">

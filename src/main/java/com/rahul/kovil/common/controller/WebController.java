@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,6 +35,11 @@ public class WebController {
 	private final AuthService authService;
 
     private final LicenseValidation licenseService;
+    
+    @Value("${client.name}")
+    private String clientName="";
+    @Value("${client.address}")
+    private String clientAddress = "";
     
 	public WebController(JwtProvider jwtProvider, AuthService authService, LicenseValidation licenseService) {
 		this.jwtProvider = jwtProvider;
@@ -123,6 +129,8 @@ public class WebController {
 	public String accountVoucher(@PathVariable String type,Model model) {
 		model.addAttribute("vtype", type);
 		model.addAttribute("today", LocalDate.now());
+		model.addAttribute("clientName", clientName);
+		model.addAttribute("clientAddress", clientAddress);
 		return "modules/account/voucher";
 	}
 	

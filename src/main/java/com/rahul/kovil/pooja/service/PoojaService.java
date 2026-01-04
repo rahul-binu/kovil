@@ -117,11 +117,11 @@ public class PoojaService {
 
 		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, payMode, vendorAccountId,
 				offering.getPooja().getAmount(), transactionDate, offering.getAccRemark(), TransactionType.RECEIPT,
-				TransactionStatus.ACTIVE, transId), tenantId, userId);
+				TransactionStatus.ACTIVE, transId, offering.getReferenceDate(), offering.getReferneceNo()), tenantId, userId);
 		
 		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, vendorAccountId, toLedger,
 				offering.getPooja().getAmount(), transactionDate, offering.getAccRemark(), TransactionType.RECEIPT,
-				TransactionStatus.ACTIVE, transId), tenantId, userId);
+				TransactionStatus.ACTIVE, transId, offering.getReferenceDate(), offering.getReferneceNo()), tenantId, userId);
 
 		OfferingDto response = new OfferingDto();
 		response.setTransId(transId);
@@ -147,17 +147,17 @@ public class PoojaService {
 		
 		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, dto.getPayMode(), vendorAccountId,
 				dto.getPayingAmount(), dto.getCloseDate().atTime(LocalTime.now()), dto.getRemark(), TransactionType.RECEIPT,
-				TransactionStatus.ACTIVE, transId), tenantId, userId);
+				TransactionStatus.ACTIVE, transId, dto.getReferenceDate(), dto.getReferenceNumber()), tenantId, userId);
 
 		Long poojaIncomeLedger = 11l;
 		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, vendorAccountId, poojaIncomeLedger,
 				dto.getPayingAmount(), dto.getCloseDate().atTime(LocalTime.now()), dto.getRemark(), TransactionType.RECEIPT,
-				TransactionStatus.ACTIVE, transId), tenantId, userId);
+				TransactionStatus.ACTIVE, transId, dto.getReferenceDate(), dto.getReferenceNumber()), tenantId, userId);
 		
 		Long poojaAdvanceLedger = 12l;
 		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, poojaAdvanceLedger, poojaIncomeLedger,
 				dto.getOldAdvance(), dto.getCloseDate().atTime(LocalTime.now()), dto.getRemark(), TransactionType.RECEIPT,
-				TransactionStatus.ACTIVE, transId), tenantId, userId);		
+				TransactionStatus.ACTIVE, transId, dto.getReferenceDate(), dto.getReferenceNumber()), tenantId, userId);		
 	}
 
 

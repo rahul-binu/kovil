@@ -46,6 +46,11 @@ public class AccountReportService {
 		
 		LocalDate openDate = openingBalanceRepository.findMaxOpeningDateByTenantIdInAndStatus(List.of("-1", tenantId), BaseStatus.ACTIVE);
 		
+		if (openDate == null) {
+		    openDate = LocalDate.now();
+		}
+
+
 		List<Object[]> led = ledgerRepository.getIdLedgerNameGroupUnderByTenentIdInAndStatus(List.of("-1", tenantId), BaseStatus.ACTIVE); 
 		ToonResponse ledgers = ToonResponse.builder().data(led).label(List.of("id", "nm", "lu")).status("OK").message("all ledger data").build();
 		List<Long> cbids = ledgerRepository.ledgerIdsByLedgerUnder(List.of("-1", tenantId), BaseStatus.ACTIVE, List.of(10l ,11l));
@@ -59,7 +64,6 @@ public class AccountReportService {
 		    Long ledgerId = ((Number) row[0]).longValue();
 		    BigDecimal amount = row[1] == null ? BigDecimal.ZERO : (BigDecimal) row[1];
 		    ledgerAmountMap.merge(ledgerId, amount, BigDecimal::add);
-		    System.out.println(row);
 		}
 
 		for (Object[] row : ledBalan) {

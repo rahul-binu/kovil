@@ -1,6 +1,7 @@
 package com.rahul.kovil.common.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.rahul.kovil.common.enums.TransactionStatus;
@@ -27,4 +28,6 @@ public class TransactionDto {
     private TransactionType type;
     private TransactionStatus status = TransactionStatus.ACTIVE;
     private String transId;
+    private LocalDate referenceDate;
+    private String referenceNo;
 }

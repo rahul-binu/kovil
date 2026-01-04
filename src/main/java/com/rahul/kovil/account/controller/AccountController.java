@@ -39,7 +39,8 @@ public class AccountController {
 	private final AccountService accountService;
 	private final AccountReportService accountReportService;
 
-	public AccountController(JwtProvider jwt, AccountService accountService, AccountReportService accountReportService) {
+	public AccountController(JwtProvider jwt, AccountService accountService,
+			AccountReportService accountReportService) {
 		this.jwt = jwt;
 		this.accountService = accountService;
 		this.accountReportService = accountReportService;
@@ -157,16 +158,31 @@ public class AccountController {
 		return ResponseEntity.ok(response);
 	}
 
+	@DeleteMapping("/voucher/{id}")
+	public ResponseEntity<ApiResponse> deleteVoucher(@RequestHeader("Authorization") String token,
+			@PathVariable String id) {
+		try {
+			String tenantId = jwt.getTenantId(token);
+			accountService.softDeleteVoucher(id, tenantId);
+			return ResponseEntity
+					.ok(ApiResponse.builder().status(HttpStatus.OK).message("Group deleted successfully").build());
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+					ApiResponse.builder().status(HttpStatus.INTERNAL_SERVER_ERROR).message(e.getMessage()).build());
+		}
+
+	}
+
 	// opening balance
 	@GetMapping("/opening-balance/{from}/{to}")
-	public ResponseEntity<List<OpeningBalanceDto>> getAccountOpeningBalance(@RequestHeader("Authorization") String token, @PathVariable String from, @PathVariable String to) {
+	public ResponseEntity<List<OpeningBalanceDto>> getAccountOpeningBalance(
+			@RequestHeader("Authorization") String token, @PathVariable String from, @PathVariable String to) {
 		String tenatId = jwt.getTenantId(token);
 		LocalDate f = LocalDate.parse(from);
 		LocalDate t = LocalDate.parse(to);
 		return ResponseEntity.ok(accountService.getAccountOpeningBalance(tenatId, f, t));
 	}
-	
-	
+
 	@PostMapping("/opening-balance")
 	public ResponseEntity<OpeningBalanceDto> saveOpeningBalance(@RequestHeader("Authorization") String token,
 			@RequestBody OpeningBalanceDto dto) {
@@ -177,22 +193,16 @@ public class AccountController {
 	@DeleteMapping("/opening-balance")
 	public ResponseEntity<ApiResponse> deleteOpeningBalance(@RequestParam Long id) {
 		accountService.deleteOpeningBalance(id);
-		return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().status(HttpStatus.OK).message("Opening balance cancelled successfully").build());
+		return ResponseEntity.status(HttpStatus.OK).body(
+				ApiResponse.builder().status(HttpStatus.OK).message("Opening balance cancelled successfully").build());
 	}
-	
+
 	// report
 	@GetMapping("/daybook/{from}/{to}")
-	public ResponseEntity<Map<String, ToonResponse>> daybook(@RequestHeader("Authorization") String token, @PathVariable String from, @PathVariable String to){
+	public ResponseEntity<Map<String, ToonResponse>> daybook(@RequestHeader("Authorization") String token,
+			@PathVariable String from, @PathVariable String to) {
 		String tenantId = jwt.getTenantId(token);
 		return ResponseEntity.ok(accountReportService.daybook(tenantId, from, to));
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 }

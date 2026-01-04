@@ -26,6 +26,8 @@ public class OfferingDto {
 	
 	private Long paymode;
 	private String accRemark;
+	private String referneceNo;
+	private LocalDate referenceDate;
 	
 	private Boolean booking;
 	private LocalDate bookingDate;

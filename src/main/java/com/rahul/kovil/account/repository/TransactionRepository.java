@@ -83,6 +83,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 			""")
 	List<Object[]> currentLedgerBalance(List<Long> ledgers ,List<TransactionStatus> status, List<String> tenantIds, LocalDateTime openDate,
 			LocalDateTime from);
+
+	Transaction findByTransId(String id);
 	
 	
 	
