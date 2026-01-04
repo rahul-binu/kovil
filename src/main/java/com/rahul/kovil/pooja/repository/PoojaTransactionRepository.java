@@ -1,5 +1,7 @@
 package com.rahul.kovil.pooja.repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,5 +25,53 @@ public interface PoojaTransactionRepository extends JpaRepository<PoojaTransacti
 		        @Param("tenantId") String tenantId,
 		        @Param("prefixes") Set<String> prefixes,
 		        @Param("status") BaseStatus status);
+
+	
+	@Query("""
+		    SELECT 
+		        FUNCTION('MONTH', pt.createdAt),
+		        COUNT(pt.id)
+		    FROM PoojaTransaction pt
+		    WHERE pt.createdAt BETWEEN :fromDate AND :toDate
+		      AND pt.status = :status
+		      AND pt.tenantId = :tenantId
+		    GROUP BY FUNCTION('MONTH', pt.createdAt)
+		    ORDER BY FUNCTION('MONTH', pt.createdAt)
+		""")
+		List<Object[]> findNoOfPoojaCompletedByMonth(
+		        @Param("fromDate") LocalDateTime fromDate,
+		        @Param("toDate") LocalDateTime toDate,
+		        BaseStatus status, 
+		        String tenantId
+		);
+		
+		@Query("""
+			    SELECT
+			        CASE
+			            WHEN FUNCTION('HOUR', pt.createdAt) BETWEEN 5 AND 11 THEN 'MORNING'
+			            WHEN FUNCTION('HOUR', pt.createdAt) BETWEEN 12 AND 16 THEN 'AFTERNOON'
+			            WHEN FUNCTION('HOUR', pt.createdAt) BETWEEN 17 AND 21 THEN 'EVENING'
+			            ELSE 'OTHER'
+			        END,
+			        COUNT(pt.id)
+			    FROM PoojaTransaction pt
+			    WHERE pt.createdAt BETWEEN :startOfDay AND :endOfDay
+			      AND pt.status = :status
+			      AND pt.tenantId = :tenantId
+			    GROUP BY
+			        CASE
+			            WHEN FUNCTION('HOUR', pt.createdAt) BETWEEN 5 AND 11 THEN 'MORNING'
+			            WHEN FUNCTION('HOUR', pt.createdAt) BETWEEN 12 AND 16 THEN 'AFTERNOON'
+			            WHEN FUNCTION('HOUR', pt.createdAt) BETWEEN 17 AND 21 THEN 'EVENING'
+			            ELSE 'OTHER'
+			        END
+			""")
+			List<Object[]> findTodayPoojaBySession(
+			        @Param("startOfDay") LocalDateTime startOfDay,
+			        @Param("endOfDay") LocalDateTime endOfDay,
+			        @Param("status") BaseStatus status,
+			        @Param("tenantId") String tenantId
+			);
+
 
 }
