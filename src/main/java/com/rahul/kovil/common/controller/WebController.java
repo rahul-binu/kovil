@@ -83,16 +83,14 @@ public class WebController {
 		return "modules/pooja/poojamaster";
 	}
 
-	@GetMapping("/pooja/receipt")
-	public String poojaHtmlPrint() {
+	@GetMapping("/pooja/receipt/{id}/{tid}")
+	public String poojaHtmlPrint(@PathVariable int id, @PathVariable String tid, Model model) {
+		model.addAttribute("transid", tid);
+		if(id == 1) {
+			return "modules/pooja/print/receiptprint1";
+		}
 		return "modules/pooja/print/receiptprint";
 	}
-
-	@GetMapping("/pooja/t-receipt")
-	public String poojaThermalPrint() {
-		return "modules/pooja/print/thermalreceiptprint";
-	}
-
 	
 	// reports
 	@GetMapping("/report")
@@ -112,6 +110,13 @@ public class WebController {
 		model.addAttribute("fo", LocalDate.now().minusDays(1));
 		model.addAttribute("to", LocalDate.now());
 		return "modules/report/pooja/pooja_advance";
+	}
+	
+	@GetMapping("/report/a-pooja")
+	public String allPoojaReport(Model model) {
+		model.addAttribute("fo", LocalDate.now().minusDays(1));
+		model.addAttribute("to", LocalDate.now());
+		return "modules/report/pooja/a_pooja";
 	}
 	
 	// accounts 

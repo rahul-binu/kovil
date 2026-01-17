@@ -18,7 +18,7 @@ function getPoojaData() {
 			"pj": {
 				"pj.date >=": $("#fromDate").val().toString(),
 				"pj.date <=": $("#toDate").val().toString(),
-				"pj.bookingStatus <>":"ACTIVE"
+				"pj.bookingStatus <>": "ACTIVE"
 			}
 		},
 		"nameFields": {
@@ -47,20 +47,18 @@ function getPoojaData() {
 function mergeData(data) {
 	let vendorMap = mapToFieldsWithKey("cstransId", data.cs.label, data.cs.data);
 	let poojaList = mapToFields(data.pj.label, data.pj.data);
-	let transList = mapToFields(data.pt.label, data.pt.data);
+	let transList = mapToFieldsGrouped("pttransId", data.pt.label, data.pt.data);
 
 	let finalMerged = [];
 
-	transList.forEach(pt => {
-		const tid = pt["pttransId"];
-
-		let pj = poojaList.find(x => x["pjtransId"] === tid) || {};
-		let cs = vendorMap[pj["pjdevotee"]] || {};
+	poojaList.forEach(p => {
+		let transactions = transList[p["pjtransId"]] || [];
+		let cs = vendorMap[p["pjdevotee"]] || {};
 
 		finalMerged.push({
-			...pt,
-			...pj,
-			...cs
+			...p,
+			...cs,
+			transactions
 		});
 	});
 
@@ -77,17 +75,15 @@ function buildPoojaTransactionTable(data, start, limit) {
     <tr>
         <th>#</th>
 		<th>Date</th>
+		<th>Action</th>
 		<th>Booking Date</th>
 		<th>Booking Close Date</th>
-        <th>Pooja</th>
         <th>Amount</th>
-        <th>Receipt No</th>
         <th>Devotee</th>
         <th>Mobile</th>
 		<th>Nakshatra</th>
 		<th>Family Name</th>
 		<th>Address</th>
-		<th>Description</th>
     </tr>`;
 	$("#poojaReportTable thead").html(thead);
 
@@ -95,31 +91,29 @@ function buildPoojaTransactionTable(data, start, limit) {
 	tbody.empty();
 
 	const end = Math.min(start + limit, data.length);
-	
+
 	for (let i = start; i < end; i++) {
 		const item = data[i];
-		/*let action = actionIcons(item['pjtransId'], "PoojaTransaction", false, true, true);*/
+		let action = actionIcons(item['pjtransId'], "PoojaTransaction", false, true, true);
 
 		tbody.append(`
             <tr>
                 <td>${i + 1}</td>
 				<td>${formatDateTime(item["pjdate"] ?? "")}</td>
+				<td>${action}</td>
 				<td>${formatDate(item["pjbookingDate"] ?? "")}</td>
 				<td>${formatDate(item["pjbookingCloseDate"] ?? "")}</td>
-                <td>${item['ptmaster'].name ?? ""}</td>
-                <td style="text-align:right;">${toSafeNumber(item["ptamount"] ?? "").toFixed(2)}</td>
-                <td>${item["ptreciptno"] ?? ""}</td>
+                <td style="text-align:right;">${toSafeNumber(item["pjamount"] ?? "").toFixed(2)}</td>
                 <td>${item["csname"] ?? ""}</td>
 				<td>${item["csmobile"] ?? ""}</td>
 				<td>${item["csnakshathra"] ?? ""}</td>
 				<td>${item["csfamilyName"] ?? ""}</td>
 				<td>${item["csaddress"] ?? ""}</td>
-				<td>${item["ptmaster"].description ?? ""}</td>
             </tr>
         `);
 	}
 	// ---------- SET FOOTER ----------
-	let totalAmount = filteredPoojaTransData.reduce((sum, item) => sum + toSafeNumber(item['ptamount'] ?? 0), 0);
+	let totalAmount = filteredPoojaTransData.reduce((sum, item) => sum + toSafeNumber(item['pjamount'] ?? 0), 0);
 	const tfoot = `
 	    <tr>
 	        <th colspan="5" style="text-align:right;">Total</th>
@@ -157,19 +151,15 @@ function emptyPoojaTable() {
 	$("#poojaReportTable thead").html(`
 	            <tr>
 	                <th>#</th>
-	                <th>Action</th>
 	                <th>Date</th>
 					<th>Booking Date</th>
 					<th>Booking Close Date</th>
-	                <th>Pooja</th>
 	                <th>Amount</th>
-	                <th>Receipt No</th>
 	                <th>Devotee</th>
 	                <th>Mobile</th>
 	                <th>Nakshatra</th>
 	                <th>Family Name</th>
 	                <th>Address</th>
-	                <th>Description</th>
 	            </tr>
 	        `);
 
@@ -192,7 +182,7 @@ function emptyPoojaTable() {
 /* ----------------------------------------------------
    GLOBAL SEARCH — FILTER + REBUILD
 ---------------------------------------------------- */
-$("#allSearchBox").on("input", function () {
+$("#allSearchBox").on("input", function() {
 	let searchTerm = $(this).val().toLowerCase().trim();
 
 	if (searchTerm === "") {
@@ -225,18 +215,18 @@ $("#excelExportPooja").click(function() {
 	}
 
 	let poojaDataSetExcel = filteredPoojaTransData.map((item, index) => [
-		index + 1,               
-		formatDateTime(item["pjdate"] ?? ""),   		       
-		formatDate(item["pjbookingDate"] ?? ""),   		       
-		formatDate(item["pjbookingCloseDate"] ?? ""),   
-		item['ptmaster']?.name ?? "",           
-		toSafeNumber(item["ptamount"] ?? "").toFixed(2), 
-		item["ptreciptno"] ?? "",          
-		item["csname"] ?? "",              
-		item["csmobile"] ?? "",            
-		item["csnakshathra"] ?? "",        
-		item["csfamilyName"] ?? "",        
-		item["csaddress"] ?? "",           
+		index + 1,
+		formatDateTime(item["pjdate"] ?? ""),
+		formatDate(item["pjbookingDate"] ?? ""),
+		formatDate(item["pjbookingCloseDate"] ?? ""),
+		item['ptmaster']?.name ?? "",
+		toSafeNumber(item["ptamount"] ?? "").toFixed(2),
+		item["ptreciptno"] ?? "",
+		item["csname"] ?? "",
+		item["csmobile"] ?? "",
+		item["csnakshathra"] ?? "",
+		item["csfamilyName"] ?? "",
+		item["csaddress"] ?? "",
 		item["ptmaster"]?.description ?? ""
 	]);
 
@@ -272,20 +262,20 @@ $("#excelExportPooja").click(function() {
 	});
 });
 
-function printPoojaTransaction(id){
+function printPoojaTransaction(id) {
 
 	$("#printFrame").attr("src", `/web/pooja/receipt/0/${id}`)
 	$("#printModal").removeClass("hidden");
 }
 
 function printIframe() {
-    const iframe = document.getElementById("printFrame");
-    const iframeWindow = iframe.contentWindow;
-    iframeWindow.focus();
-    iframeWindow.onafterprint = () => {
-        iframe.src = iframe.src;
-    };
-    iframeWindow.print();
+	const iframe = document.getElementById("printFrame");
+	const iframeWindow = iframe.contentWindow;
+	iframeWindow.focus();
+	iframeWindow.onafterprint = () => {
+		iframe.src = iframe.src;
+	};
+	iframeWindow.print();
 }
 
 function closeModal() {
@@ -294,13 +284,42 @@ function closeModal() {
 	location.reload();
 }
 
+function deletePoojaTransaction(id) {
+	openUniversalConfirmModal({
+		title: "Delete Voucher",
+		message: "Are you sure you want to delete this pooja entry?",
+		actionText: "Delete",
+		onConfirm: () => confirmDeletePoojaRow(id)
+	});
+}
+
+function confirmDeletePoojaRow(tid){
+	fetch(`/api/pooja/offering/${tid}`, {
+	       method: "DELETE",
+	       headers: {
+	           "Accept": "application/json",
+	           "Authorization": "Bearer " + localStorage.getItem("jwtToken")
+	       }
+	   })
+	   .then(res => {
+	       if (!res.ok) {
+	           throw new Error(`Delete failed: ${res.status}`);
+	       }
+	       return res.json();
+	   })
+	   .then(data => {
+			showMessage("Success",  " Entry is Deleted", true);
+			getPoojaData();
+	   })
+	   .catch(err => {
+	   		showMessage("Failed",  " Entry failed to Delete", false);
+	   });
+}
 
 
 
 
 
 
-	
-	
-	
-	
+
+

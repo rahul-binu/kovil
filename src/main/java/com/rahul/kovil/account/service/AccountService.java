@@ -124,8 +124,9 @@ public class AccountService implements AccountServiceApi {
 		Transaction transaction = modelMapper.map(transDto, Transaction.class);
 		transaction.setTenantId(tenantId);
 		transaction.setCreatedUser(userId);
-		Long voucherNo = transactionRepository.findMaxVoucherNumberByVoucherTypeAndTenantIdAndStatus(
-				transDto.getVoucherType(), tenantId, TransactionStatus.ACTIVE);
+		Long vno = transDto.getVoucherNo();
+		Long voucherNo = (vno == null || vno == 0l)? transactionRepository.findMaxVoucherNumberByVoucherTypeAndTenantIdAndStatus(
+				transDto.getVoucherType(), tenantId, TransactionStatus.ACTIVE) : vno;
 		transaction.setVoucherNo(voucherNo == null ? 1 : voucherNo + 1);
 		Transaction savedTransaction = transactionRepository.save(transaction);
 		return modelMapper.map(savedTransaction, TransactionDto.class);
@@ -285,7 +286,7 @@ public class AccountService implements AccountServiceApi {
 
 	public void softDeleteVoucher(String id, String tenantId) {
 		Transaction transaction = transactionRepository.findByTransId(id);
-		transaction.setStatus(TransactionStatus.CANCELLED);
+		transaction.setStatus(TransactionStatus.CANCELED);
 		transactionRepository.save(transaction);
 	}
 

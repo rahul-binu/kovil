@@ -447,7 +447,9 @@ function formatDate(input) {
 	let mm = String(date.getMonth() + 1).padStart(2, '0');
 	let yy = String(date.getFullYear());
 
-	return `${dd}-${mm}-${yy}`;
+	let newdd = `${dd}-${mm}-${yy}`;
+	if(newdd == 'NaN-NaN-NaN') return input;
+	return newdd;
 }
 
 

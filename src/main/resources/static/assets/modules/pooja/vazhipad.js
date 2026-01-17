@@ -128,6 +128,7 @@ function getPaymodes() {
 
 function selectCustomer(customer) {
 	$("#vendorId").val(customer.transId);
+	$("#vendorAccountId").val(customer.accountId);
 	$("#fullName").val(customer.fullName);
 	$("#phoneNumber").val(customer.mobile);
 	$("#familyName").val(customer.familyName);
@@ -220,14 +221,14 @@ $("#savePooja").click(function() {
 	if (choosedPoojas.length == 0) {
 		errors.push("Select atleast one pooja");
 	}
-	if(document.getElementById("poojaBooking").checked && $("#poojaBookingDate").val()==''){
+	if (document.getElementById("poojaBooking").checked && $("#poojaBookingDate").val() == '') {
 		errors.push("Select booking date");
 	}
 	if (toSafeNumber($("#payModeChosen").val()) == 0) {
 		errors.push("Chose any paymode");
 	}
-	if($("#phoneNumber").val().length != 10){
-		
+	if ($("#phoneNumber").val().length != 10) {
+
 	}
 
 	if (errors.length > 0) {
@@ -250,6 +251,8 @@ function savePooja() {
 		vendorFamilyName: $("#familyName").val(),
 		venodrAddress: $("#address").val(),
 		vendorNakshatra: $("#nakshatra").val(),
+		
+		vendorAccountId: $("#vendorAccountId").val(),
 
 		paymode: $("#payModeChosen").val(),
 
@@ -262,7 +265,7 @@ function savePooja() {
 			amount: toSafeNumber($("#totalAmount").val()),
 			status: "ACTIVE"
 		},
-		
+
 		bookingStatus: document.getElementById("poojaBooking").checked ? "ACTIVE" : "NONE",
 		booking: document.getElementById("poojaBooking").checked,
 		bookingDate: $("#poojaBookingDate").val(),
@@ -292,20 +295,15 @@ function savePooja() {
 		.then(r => r.json())
 		.then(res => {
 			console.log("Saved:", res);
-			printPoojaRecipt(res);
+			openPrintModal(res.transId);
 			// success toast or redirect
 		})
 		.catch(err => console.error("Error:", err));
 }
 
-function printPoojaRecipt(data){
-	console.log(data);
-	if (alert("Please use a thermal printer") === undefined) {
-		location.reload();
-	}
-}
 
-$("#poojaBooking").on("change", function () {
+
+$("#poojaBooking").on("change", function() {
 	if ($(this).is(":checked")) {
 		bookingEnabled();
 	} else {
@@ -329,11 +327,26 @@ function getPoojaMasterData(id, fl) {
 	return objPoojaMasterData[id]?.[fl];
 }
 
+function openPrintModal(tid = "pja.260104120217.96959e") {
+	$("#printFrame").attr("src", `/web/pooja/receipt/0/${tid}`)
+	$("#printModal").removeClass("hidden");
+}
 
+function printIframe() {
+    const iframe = document.getElementById("printFrame");
+    const iframeWindow = iframe.contentWindow;
+    iframeWindow.focus();
+    iframeWindow.onafterprint = () => {
+        iframe.src = iframe.src;
+    };
+    iframeWindow.print();
+}
 
-
-
-
+function closeModal() {
+	document.getElementById("printModal").classList.add("hidden");
+	document.getElementById("printFrame").src = "";
+	location.reload();
+}
 
 
 

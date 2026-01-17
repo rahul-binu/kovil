@@ -31,4 +31,6 @@ public interface VendorRepository extends JpaRepository<Vendor, Long>{
 	List<Object[]> findNoOfDevoteeRegistarByMonth(LocalDateTime fromDate, LocalDateTime toDate, BaseStatus status,
 			String tenantId);
 
+	
+	Vendor findByTransId(String transId);
 }

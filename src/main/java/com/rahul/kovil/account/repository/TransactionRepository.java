@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -64,7 +65,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
 	
 	@Query("""
-			SELECT t1.creditLedger AS led, SUM(t1.amount) AS amt FROM Transaction t1
+			SELECT t1.creditLedger AS led, -SUM(t1.amount) AS amt FROM Transaction t1
 				WHERE t1.tenantId IN :tenantIds 
 					AND t1.transactionDate < :from
 					AND t1.transactionDate >= :openDate
@@ -72,7 +73,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 					AND t1.creditLedger IN :ledgers
 				GROUP BY t1.creditLedger
 			UNION ALL
-			SELECT t1.debitLedger AS led, -SUM(t1.amount) AS amt FROM Transaction t1
+			SELECT t1.debitLedger AS led, SUM(t1.amount) AS amt FROM Transaction t1
 				WHERE t1.tenantId IN :tenantIds 
 					AND t1.transactionDate < :from
 					AND t1.transactionDate >= :openDate
@@ -86,6 +87,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
 	Transaction findByTransId(String id);
 	
+	@Modifying
+	@Query("UPDATE Transaction t SET t.status = :status WHERE t.transId = :tid")
+	void softDelete(String tid, TransactionStatus status);
 	
 	
 	

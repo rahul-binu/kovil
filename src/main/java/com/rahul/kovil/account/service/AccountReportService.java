@@ -50,7 +50,7 @@ public class AccountReportService {
 		    openDate = LocalDate.now();
 		}
 
-
+System.out.println(from);
 		List<Object[]> led = ledgerRepository.getIdLedgerNameGroupUnderByTenentIdInAndStatus(List.of("-1", tenantId), BaseStatus.ACTIVE); 
 		ToonResponse ledgers = ToonResponse.builder().data(led).label(List.of("id", "nm", "lu")).status("OK").message("all ledger data").build();
 		List<Long> cbids = ledgerRepository.ledgerIdsByLedgerUnder(List.of("-1", tenantId), BaseStatus.ACTIVE, List.of(10l ,11l));

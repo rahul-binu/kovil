@@ -98,5 +98,13 @@ public class PoojaController {
 					.message("Failed to close pooja advance").status(HttpStatus.INTERNAL_SERVER_ERROR).build());
 		}
 	}
-
+	
+	@DeleteMapping("/offering/{tid}")
+	public ResponseEntity<ApiResponse> deletePooja(@PathVariable String tid) {
+		String tenantId = "";
+		poojaService.softDelete(tid, tenantId);
+		ApiResponse res = ApiResponse.builder().message("Pooja deleted successfully").status(HttpStatus.OK)
+				.build();
+		return ResponseEntity.ok(res);
+	}
 }

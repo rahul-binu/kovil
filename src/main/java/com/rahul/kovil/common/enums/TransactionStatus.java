@@ -1,5 +1,5 @@
 package com.rahul.kovil.common.enums;
 
 public enum TransactionStatus {
-	ACTIVE, CANCELLED, PENDING, ARCHIVED
+	ACTIVE, CANCELED, PENDING, ARCHIVED
 }

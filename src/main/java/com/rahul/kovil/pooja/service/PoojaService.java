@@ -9,8 +9,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.rahul.kovil.account.repository.TransactionRepository;
 import com.rahul.kovil.common.api.AccountServiceApi;
 import com.rahul.kovil.common.api.VendorServiceApi;
 import com.rahul.kovil.common.dto.OfferingDto;
@@ -39,6 +41,9 @@ public class PoojaService {
 
 	private final PoojaRepository poojaRepository;
 	private final PoojaTransactionRepository poojaTransactionRepository;
+	
+	@Autowired
+	private TransactionRepository transactionRepository;
 
 	public PoojaService(VendorServiceApi vendorService, PoojaRepository poojaRepository,
 			PoojaTransactionRepository poojaTransactionRepository, AccountServiceApi accountService) {
@@ -55,7 +60,7 @@ public class PoojaService {
 		String transId = SiteHelper.transId("pja");
 
 		String vendorId = offering.getVendorId();
-		Long vendorAccountId = 0L;
+		Long vendorAccountId = offering.getVendorAccountId();
 
 		LocalDateTime transactionDate = offering.getPooja().getDate();
 
@@ -115,11 +120,11 @@ public class PoojaService {
 		
 		Long toLedger = offering.getBooking()? poojaAdvanceLedger : poojaIncomeLedger;
 
-		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, payMode, vendorAccountId,
+		TransactionDto transaction = accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null,  vendorAccountId, payMode, 
 				offering.getPooja().getAmount(), transactionDate, offering.getAccRemark(), TransactionType.RECEIPT,
 				TransactionStatus.ACTIVE, transId, offering.getReferenceDate(), offering.getReferneceNo()), tenantId, userId);
 		
-		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, vendorAccountId, toLedger,
+		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", transaction.getVoucherNo(), toLedger, vendorAccountId,
 				offering.getPooja().getAmount(), transactionDate, offering.getAccRemark(), TransactionType.RECEIPT,
 				TransactionStatus.ACTIVE, transId, offering.getReferenceDate(), offering.getReferneceNo()), tenantId, userId);
 
@@ -158,6 +163,13 @@ public class PoojaService {
 		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, poojaAdvanceLedger, poojaIncomeLedger,
 				dto.getOldAdvance(), dto.getCloseDate().atTime(LocalTime.now()), dto.getRemark(), TransactionType.RECEIPT,
 				TransactionStatus.ACTIVE, transId, dto.getReferenceDate(), dto.getReferenceNumber()), tenantId, userId);		
+	}
+
+	@Transactional
+	public void softDelete(String tid, String tenantId) {
+		poojaRepository.softDelete(tid, BaseStatus.CANCELED);
+		transactionRepository.softDelete(tid, TransactionStatus.CANCELED);
+		poojaTransactionRepository.softDelete(tid, BaseStatus.CANCELED);
 	}
 
 

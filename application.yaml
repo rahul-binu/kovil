@@ -38,9 +38,9 @@ spring:
     show-sql: false
     defer-datasource-initialization: true
 
-#  sql:
-#    init:
-#      mode: always
+  sql:
+    init:
+      mode: never
 
   h2:
     console:

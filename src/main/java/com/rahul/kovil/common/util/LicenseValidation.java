@@ -10,15 +10,15 @@ public class LicenseValidation {
 
     public LicenseStatus checkLicense() {
         Path licensePath = Path.of("license.key");
-
+        
         if (!Files.exists(licensePath)) {
             return new LicenseStatus(false, "License file missing.\nContact your developer.");
         }
-
         try {
             String savedId = Files.readString(licensePath).trim();
             String currentId = HardwareIdUtil.getHardwareId();
 
+            System.err.println(savedId+"\nrahul-"+currentId);
             if (!currentId.equals(savedId)) {
                 return new LicenseStatus(false, "Unauthorized machine.\nApp will now close.");
             }

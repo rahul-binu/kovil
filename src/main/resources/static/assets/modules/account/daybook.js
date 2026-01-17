@@ -113,7 +113,7 @@ function buildDataArray() {
 			tdata.push(daybookCustruct(formatDateTime(t.tdt), getLedgetDetails(t.deb, "nm") + "[" + getLedgetDetails(t.crd, "nm") + "]", t.rmk, t.vno, "", formatRupee(t.amt), "", "", ""));
 
 			cashOpening -= amountNum;
-			cashPayment = + amountNum;
+			cashPayment += amountNum;
 			tableText += `
 				<tr>
 					<td>${formatDateTime(t.tdt)}</td>
@@ -133,13 +133,14 @@ function buildDataArray() {
 			if (allBankIds.includes(t.deb)) {
 				tdata.push(daybookCustruct(formatDateTime(t.tdt), getLedgetDetails(t.deb, "nm") + "[" + getLedgetDetails(t.crd, "nm") + "]", t.rmk, t.vno, "", "", formatRupee(t.amt), "", ""));
 
-				bankOpening -= amountNum;
-
+				bankOpening += amountNum;
+				bankReceipt[t.deb] += amountNum;
+				
 				tableText += `
 					<tr>
 						<td>${formatDateTime(t.tdt)}</td>
 						<td>
-							${getLedgetDetails(t.deb, "nm")} [${getLedgetDetails(t.crd, "nm")}]
+							${getLedgetDetails(t.crd, "nm")} [${getLedgetDetails(t.deb, "nm")}]
 							${t.rmk ? `-- <span class="light-text">${t.rmk}</span>` : ""}
 						</td>
 						<td>${t.vno}</td>
@@ -176,13 +177,14 @@ function buildDataArray() {
 			if (allBankIds.includes(t.crd)) {
 				tdata.push(daybookCustruct(formatDateTime(t.tdt), getLedgetDetails(t.deb, "nm") + "[" + getLedgetDetails(t.crd, "nm") + "]", t.rmk, t.vno, "", "", "", formatRupee(t.amt), ""));
 
-				bankOpening += amountNum;
-
+				bankOpening -= amountNum;
+				bankPayment[t.crd] += amountNum;
+				
 				tableText += `
 							<tr>
 								<td>${formatDateTime(t.tdt)}</td>
 								<td>
-									${getLedgetDetails(t.deb, "nm")} [${getLedgetDetails(t.crd, "nm")}]
+									${getLedgetDetails(t.crd, "nm")} [${getLedgetDetails(t.deb, "nm")}]
 									${t.rmk ? `-- <span class="light-text">${t.rmk}</span>` : ""}
 								</td>
 								<td>${t.vno}</td>

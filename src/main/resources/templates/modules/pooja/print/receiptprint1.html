@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="UTF-8">
+<title>Temple Receipt - A4 3 Copies</title>
+
+<style>
+@page {
+    size: A4;
+    margin: 0;
+}
+
+body {
+    margin: 0;
+    font-family: "Noto Sans Malayalam", sans-serif;
+}
+
+/* A4 PAGE */
+.page {
+    width: 210mm;
+    height: 297mm;
+    display: flex;
+    flex-direction: column;
+}
+
+/* EACH RECEIPT */
+.receipt {
+    height: 99mm; /* 297 / 3 */
+    box-sizing: border-box;
+    border-bottom: 1px dashed #c96b2c;
+    position: relative;
+	padding: 10px;
+	padding-left: 50px;
+	padding-right: 50px;
+}
+
+/* HEADER */
+.header {
+    background: #d97a33;
+    color: #fff;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    overflow: hidden;
+}
+
+.logo img {
+    width: 100%;
+}
+
+.header-text {
+    text-align: center;
+    flex: 1;
+}
+
+.header-text h1 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.header-text small {
+    font-size: 13px;
+}
+
+/* BODY */
+.body {
+    padding: 8px 10px;
+    font-size: 14px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.label {
+    font-weight: bold;
+}
+
+.line {
+    border-bottom: 1px dotted #000;
+    flex: 1;
+    margin-left: 5px;
+}
+
+/* TABLE */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+}
+
+.table th,
+.table td {
+    border: 1px solid #c96b2c;
+    padding: 4px;
+    text-align: center;
+    font-size: 13px;
+}
+
+/* FOOTER */
+.footer {
+    position: absolute;
+    bottom: 6px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+}
+
+.amount {
+    font-size: 16px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <!-- RECEIPT 1 -->
+    <div class="receipt">
+        <div class="header">
+            <div class="logo">
+                <img src="/dynamic/assets/app_images/default_images/ayyappan_logo-removebg-preview.png">
+            </div>
+            <div class="header-text">
+                <h1>ശ്രീ പ്രാഞ്ചേരി കണ്‍സ്ടണ്‍ ശാസ്താ ക്ഷേത്രം</h1>
+                <small>വഴിപാടു രസീത്</small>
+            </div>
+        </div>
+
+        <div class="body">
+            <div class="row">
+                <span><b>നമ്പർ:</b> 197895</span>
+                <span>തീയതി: 02/12/2025</span>
+            </div>
+
+            <div class="row">
+                <span class="label">പേര്:</span>
+                <span class="line">RAHUL</span>
+            </div>
+
+            <table class="table">
+                <tr>
+                    <th>വഴിപാടു</th>
+                    <th>എണ്ണം</th>
+                    <th>നിരക്ക്</th>
+                    <th>തുക</th>
+                </tr>
+                <tr>
+                    <td>ചന്ദനം</td>
+                    <td>1</td>
+                    <td>20</td>
+                    <td>20</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="footer">
+            <div class="amount">ആകെ തുക: ₹20.00</div>
+            <div>സെക്രട്ടറി</div>
+        </div>
+    </div>
+
+    <!-- RECEIPT 2 -->
+    <div class="receipt">
+        <!-- SAME CONTENT (duplicate or dynamic data) -->
+    </div>
+
+    <!-- RECEIPT 3 -->
+    <div class="receipt">
+        <!-- SAME CONTENT (duplicate or dynamic data) -->
+    </div>
+
+</div>
+
+</body>
+</html>

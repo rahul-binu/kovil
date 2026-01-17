@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -73,5 +74,12 @@ public interface PoojaTransactionRepository extends JpaRepository<PoojaTransacti
 			        @Param("tenantId") String tenantId
 			);
 
+			
+			List<PoojaTransaction> findByTransId(String transId);
+
+
+			@Modifying
+			@Query("UPDATE PoojaTransaction p SET p.status = :status WHERE p.transId = :tid")
+			void softDelete(String tid, BaseStatus status);
 
 }
