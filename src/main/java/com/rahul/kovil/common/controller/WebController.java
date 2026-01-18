@@ -109,6 +109,8 @@ public class WebController {
 	public String poojaAdvanceReport(Model model) {
 		model.addAttribute("fo", LocalDate.now().minusDays(1));
 		model.addAttribute("to", LocalDate.now());
+		model.addAttribute("clientName", clientName);
+		model.addAttribute("clientAddress", clientAddress);
 		return "modules/report/pooja/pooja_advance";
 	}
 	

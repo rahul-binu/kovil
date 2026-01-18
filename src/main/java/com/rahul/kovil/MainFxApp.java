@@ -13,8 +13,6 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.WebApplicationType;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.net.Socket;

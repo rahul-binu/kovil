@@ -82,15 +82,19 @@ function buildPoojaTransactionTable(data, start, limit) {
 	tbody.empty();
 
 	const end = Math.min(start + limit, data.length);
-	console.log(start)
+	
 	let tbl = '';
 	for (let i = start; i < end; i++) {
 		const item = data[i];
-		console.log(item)
+		
 		let action = `
 		  <i class="fa-solid fa-eye blue pointer"
 		     title="View details"
 		     onclick="showPoojaDetails(${i})"></i>
+
+			 <i class="fa-solid fa-print green pointer"
+		     title="print details"
+		     onclick="printPoojaDetails(${i})"></i>
 			 `;
 		tbl += `
             <tr>
@@ -345,7 +349,7 @@ function getPaymodes() {
 
 $("#savePooja").click(function() {
 	let tid = $(this).attr("data-id");
-	console.log(tid);
+	
 
 	let fdata = {
 		transId: tid,
@@ -358,7 +362,7 @@ $("#savePooja").click(function() {
 		closeDate: $("#md-closeDate").val(),
 		vendorAccId: $(this).attr("data-vid")
 	}
-	console.log(fdata);
+	
 	fetch("/api/pooja/advance-close", {
 		method: "POST",
 		headers: {
@@ -382,3 +386,82 @@ $("#savePooja").click(function() {
 		});
 })
 
+function printPoojaDetails(id){
+	let pooja = filteredPoojaTransData[id];
+ 	let transactions = pooja.transactions;
+
+	if (!transactions || transactions.length === 0) return;
+	let tbl = '';
+	transactions.forEach((t, i) => {
+		let master = t.ptmaster;
+
+		tbl+=`
+	      <tr class="hover:bg-gray-50">
+	        <td class="px-3 py-2 border text-center">${i + 1}</td>
+	        <td class="px-3 py-2 border">${new Date(t.ptcreated).toLocaleString()}</td>
+	        <td class="px-3 py-2 border">${t.ptreciptno}</td>
+			<td class="px-3 py-2 border text-right font-medium">
+			  ₹ ${t.ptamount}
+			</td>
+	        <td class="px-3 py-2 border text-xs">${master.name}</td>
+			<td class="px-3 py-2 border text-xs">${master.groupName}</td>
+			<td class="px-3 py-2 border text-xs">${master.materialsList}</td>
+	      </tr>
+    	`;
+	});
+	let tbltxt = `
+		<div style="font-family: 'Times New Roman', serif; width: 650px; margin: auto; color: #000; padding: 20px; border: 1px solid #000;">
+
+			<!-- Header -->
+			<div style="text-align: center; margin-bottom: 20px;">
+				<h1 style="margin:0; font-size: 28px; letter-spacing: 1px;">${$("#clientName").val()}</h1>
+				<h4 style="margin:0; font-size: 20px; letter-spacing: 1px;">${$("#clientAddress").val()}</h4>
+				<h5 style="margin:0; font-size: 20px; letter-spacing: 1px;">Pooja Booking Receipt</h5>
+				<p style="margin:2px 0; font-size: 14px;">${formatDateTime(pooja.pjdate)}</p>
+			</div>
+
+ 			<div style="margin-bottom: 20px; line-height: 1.6;">
+				<p><strong>Devotee Name:</strong> ${pooja.csname}</p>
+				<p><strong>Devotee Nakshatra:</strong> ${pooja.csnakshathra}</p>
+				<p><strong>Devotee Address:</strong>${pooja.csfamilyName} ${pooja.csaddress} ${pooja.csmobile}</p>
+			</div>
+
+			<table>${tbl}</table>
+
+
+			<!-- Amount & Remarks -->
+			<div style="margin-bottom: 30px; line-height: 1.5;">
+				<p><strong>Advance Paid Amount:</strong> <span style="font-size: 18px; font-weight: bold;">${pooja.pjadvanceAmount || "-"}</span></p>
+				<p><strong>Total Pooja Amount:</strong> <span style="font-size: 18px; font-weight: bold;">${pooja.pjamount || "-"}</span></p>
+				<p><strong>Remining Payable Amount:</strong> <span style="font-size: 18px; font-weight: bold;">${(pooja.pjamount - pooja.pjadvanceAmount) || "-"}</span></p>
+				
+			</div>
+
+			<!-- Footer / Signatures -->
+			<div style="display: flex; justify-content: space-between; margin-top: 40px; text-align: center;">
+				<div>
+					<p>Prepared By</p>
+					<p>________________</p>
+				</div>
+				<div>
+					<p>Checked By</p>
+					<p>________________</p>
+				</div>
+				<div>
+					<p>Authorized By</p>
+					<p>________________</p>
+				</div>
+			</div>
+
+			<!-- Optional Note -->
+			<div style="text-align: center; margin-top: 30px; font-size: 12px;">
+				<em>Note: This is a computer-generated voucher</em>
+			</div>
+
+		</div>
+	`;
+
+
+
+	printTableContent(tbltxt, "");
+}

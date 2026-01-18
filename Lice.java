@@ -1,4 +1,3 @@
-package com.rahul.kovil.common.util;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
@@ -6,7 +5,16 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.util.UUID;
 
-public final class HardwareIdUtil {
+
+public class Lice {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+        System.out.println(HardwareIdUtil.getHardwareId());
+    }
+}
+
+
+class HardwareIdUtil {
 
     private static volatile String CACHED_HWID;
 
