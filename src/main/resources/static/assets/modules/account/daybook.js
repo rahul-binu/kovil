@@ -357,6 +357,7 @@ $('#htmlPrintButton').click(function() {
             <tbody>${tableText}</tbody>
         </table>
     `;
+	tbltxt+= $("#daybookSummaryBlock").html();
 	let header = `
         <h3 style="text-align:center">Day Book</h3>
 		<h4 style="text-align:center">${$("#fromDate").val()} - ${$("#toDate").val()}</h4>

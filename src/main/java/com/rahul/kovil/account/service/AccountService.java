@@ -1,5 +1,6 @@
 package com.rahul.kovil.account.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -121,6 +122,7 @@ public class AccountService implements AccountServiceApi {
 	}
 
 	public TransactionDto saveTransaction(TransactionDto transDto, String tenantId, String userId) {
+		if(transDto.getAmount().compareTo(new BigDecimal(0)) == 0) throw new RuntimeException("Invalid Amount");
 		Transaction transaction = modelMapper.map(transDto, Transaction.class);
 		transaction.setTenantId(tenantId);
 		transaction.setCreatedUser(userId);

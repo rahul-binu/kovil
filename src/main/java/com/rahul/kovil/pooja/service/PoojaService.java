@@ -1,5 +1,6 @@
 package com.rahul.kovil.pooja.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -24,7 +25,6 @@ import com.rahul.kovil.common.enums.BaseStatus;
 import com.rahul.kovil.common.enums.BookingStatus;
 import com.rahul.kovil.common.enums.TransactionStatus;
 import com.rahul.kovil.common.enums.TransactionType;
-import com.rahul.kovil.common.enums.VendorType;
 import com.rahul.kovil.common.util.SiteHelper;
 import com.rahul.kovil.pooja.entity.Pooja;
 import com.rahul.kovil.pooja.entity.PoojaTransaction;
@@ -119,13 +119,14 @@ public class PoojaService {
 		Long poojaAdvanceLedger = 12l;
 		
 		Long toLedger = offering.getBooking()? poojaAdvanceLedger : poojaIncomeLedger;
+		BigDecimal amount = offering.getBooking()? offering.getAdvanceAmount() : offering.getPooja().getAmount();
 
 		TransactionDto transaction = accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null,  vendorAccountId, payMode, 
-				offering.getPooja().getAmount(), transactionDate, offering.getAccRemark(), TransactionType.RECEIPT,
+				amount, transactionDate, offering.getAccRemark(), TransactionType.RECEIPT,
 				TransactionStatus.ACTIVE, transId, offering.getReferenceDate(), offering.getReferneceNo()), tenantId, userId);
 		
 		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", transaction.getVoucherNo(), toLedger, vendorAccountId,
-				offering.getPooja().getAmount(), transactionDate, offering.getAccRemark(), TransactionType.RECEIPT,
+				amount, transactionDate, offering.getAccRemark(), TransactionType.RECEIPT,
 				TransactionStatus.ACTIVE, transId, offering.getReferenceDate(), offering.getReferneceNo()), tenantId, userId);
 
 		OfferingDto response = new OfferingDto();
@@ -150,12 +151,12 @@ public class PoojaService {
 		Long vendorAccountId = dto.getVendorAccId();
 //		LocalDateTime c = dto.getCloseDate().now();
 		
-		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, dto.getPayMode(), vendorAccountId,
+		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, vendorAccountId, dto.getPayMode(), 
 				dto.getPayingAmount(), dto.getCloseDate().atTime(LocalTime.now()), dto.getRemark(), TransactionType.RECEIPT,
 				TransactionStatus.ACTIVE, transId, dto.getReferenceDate(), dto.getReferenceNumber()), tenantId, userId);
 
 		Long poojaIncomeLedger = 11l;
-		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, vendorAccountId, poojaIncomeLedger,
+		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, poojaIncomeLedger, vendorAccountId,
 				dto.getPayingAmount(), dto.getCloseDate().atTime(LocalTime.now()), dto.getRemark(), TransactionType.RECEIPT,
 				TransactionStatus.ACTIVE, transId, dto.getReferenceDate(), dto.getReferenceNumber()), tenantId, userId);
 		

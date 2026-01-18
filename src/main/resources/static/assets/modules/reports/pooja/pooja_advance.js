@@ -358,7 +358,7 @@ $("#savePooja").click(function() {
 		referenceNumber: $("#payingReferenceNumber").val(),
 		referenceDate: $("#payingReferenceDate").val(),
 		remark: $("#payingRemark").val(),
-		oldAdvance: toSafeNumber($("#md-poojaTotalAmount").val()),
+		oldAdvance: toSafeNumber($("#md-advanceAmount").html()),
 		closeDate: $("#md-closeDate").val(),
 		vendorAccId: $(this).attr("data-vid")
 	}
@@ -379,6 +379,7 @@ $("#savePooja").click(function() {
 		})
 		.then(data => {
 			showMessage("Success", data.message, true);
+			getPoojaData();
 		})
 		.catch(err => {
 			console.error(err);
