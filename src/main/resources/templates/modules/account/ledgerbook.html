@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/app.html}">
+
+<th:block layout:fragment="head">
+	<title>Ledgerbook</title>
+</th:block>
+<div layout:fragment="content">
+
+	<style>
+		.light-text {
+			color: gray;
+		}
+		.bold-row {
+		    font-weight: bold !important;
+		    background-color: rgba(126, 168, 230, 0.25) !important;
+		}
+		
+	</style>
+
+	<div class="min-h-screen bg-gray-100 p-6">
+		<div class="">
+
+			<!-- Header -->
+			<div class="flex items-center my-10">
+				<div class="flex-grow border-b-2 border-blue-500"></div>
+				<span class="px-4 text-2xl font-bold text-gray-800">Ledger Book</span>
+				<div class="flex-grow border-b-2 border-blue-500"></div>
+			</div>
+
+			<!-- Filters -->
+			<div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end mb-6">
+
+				<div class="flex flex-col">
+					<label class="text-sm font-medium text-gray-700 mb-1">From</label>
+					<input id="fromDate" type="date" th:value="${today}" class="border rounded-lg px-3 py-2">
+				</div>
+
+				<div class="flex flex-col">
+					<label class="text-sm font-medium text-gray-700 mb-1">To</label>
+					<input id="toDate" type="date" th:value="${today}" class="border rounded-lg px-3 py-2">
+				</div>
+
+				<div>
+					<button class="search-btn" id="searchButton">Search</button>
+				</div>
+
+				<div class="flex gap-3 justify-end">
+					<button class="print-btn" id="htmlPrintButton">Print</button>
+				</div>
+
+			</div>
+
+			<!-- Table Container -->
+			<div class="bg-white rounded-xl shadow-lg p-8 mb-12 border border-gray-100 max-h-[70vh] overflow-y-auto">
+				<div id="daybookTableAppendArea">
+					<table id="daybookTable" class="app-table">
+						<thead></thead>
+					</table>
+				</div>
+			</div>
+
+
+
+		</div>
+	</div>
+
+
+</div>
+
+<div layout:fragment="scripts">
+	<script th:src="@{/assets/modules/account/ledgerbook.js}"></script>
+</div>
+
+</html>

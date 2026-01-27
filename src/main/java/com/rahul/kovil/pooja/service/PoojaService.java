@@ -120,12 +120,17 @@ public class PoojaService {
 		
 		Long toLedger = offering.getBooking()? poojaAdvanceLedger : poojaIncomeLedger;
 		BigDecimal amount = offering.getBooking()? offering.getAdvanceAmount() : offering.getPooja().getAmount();
-
-		TransactionDto transaction = accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null,  vendorAccountId, payMode, 
-				amount, transactionDate, offering.getAccRemark(), TransactionType.RECEIPT,
-				TransactionStatus.ACTIVE, transId, offering.getReferenceDate(), offering.getReferneceNo()), tenantId, userId);
+		toLedger = poojaIncomeLedger;
+//
+//		TransactionDto transaction = accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null,  vendorAccountId, payMode, 
+//				amount, transactionDate, offering.getAccRemark(), TransactionType.RECEIPT,
+//				TransactionStatus.ACTIVE, transId, offering.getReferenceDate(), offering.getReferneceNo()), tenantId, userId);
+//		
+//		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", transaction.getVoucherNo(), toLedger, vendorAccountId,
+//				amount, transactionDate, offering.getAccRemark(), TransactionType.RECEIPT,
+//				TransactionStatus.ACTIVE, transId, offering.getReferenceDate(), offering.getReferneceNo()), tenantId, userId);
 		
-		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", transaction.getVoucherNo(), toLedger, vendorAccountId,
+		TransactionDto transaction = accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null,  toLedger, payMode, 
 				amount, transactionDate, offering.getAccRemark(), TransactionType.RECEIPT,
 				TransactionStatus.ACTIVE, transId, offering.getReferenceDate(), offering.getReferneceNo()), tenantId, userId);
 

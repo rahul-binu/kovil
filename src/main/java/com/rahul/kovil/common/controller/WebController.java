@@ -155,6 +155,12 @@ public class WebController {
 		return "modules/account/daybook";
 	}
 	
+	@GetMapping("/accounts/ledgerbook")
+	public String ledgerbook(Model model) {
+		model.addAttribute("today", LocalDate.now());
+		return "modules/account/ledgerbook";
+	}
+	
 	// devotee
 	@GetMapping("/vendor/{vtype}")
 	public String vendorPage(@PathVariable String vtype, Model model) {
