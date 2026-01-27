@@ -120,11 +120,117 @@ function loadDashboard() {
 	});
 }
 
+
+function loadBooking() {
+	let date = $("#poojaBookingDate").val();
+	$.ajax({
+		url: '/api/dashboard/day/pbooking',
+		method: 'GET',
+		headers: {
+			"Content-Type": "application/json",
+			"Authorization": "Bearer " + localStorage.getItem("jwtToken")
+		},
+		data: {
+			date: date
+		},
+		success: function(res) {
+			buildPoojaBookingList(res);
+		},
+		error: function(err) {
+			console.error('Dashboard API failed', err);
+		}
+	});
+}
+
+function buildPoojaBookingList(data) {
+	const tbody = document.querySelector("tbody");
+	tbody.innerHTML = "";
+
+	const devotees = Object.fromEntries(
+		data.v.map(d => [d.transId, d])
+	);
+
+	const transactionsByTransId = {};
+	data.pt.forEach(t => {
+		if (!transactionsByTransId[t.transId]) {
+			transactionsByTransId[t.transId] = [];
+		}
+		transactionsByTransId[t.transId].push(t);
+	});
+
+	data.pj.forEach(pj => {
+		const devotee = devotees[pj.devotee];
+		if (!devotee) return;
+
+		const tr = document.createElement("tr");
+		tr.innerHTML = `
+            <td class="px-3 py-2">${devotee.fullName}</td>
+            <td class="px-3 py-2">${devotee.mobile}</td>
+            <td class="px-3 py-2 text-center">
+                <button
+                  class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md"
+                  onclick='openPoojaModal(
+                    ${JSON.stringify(pj)},
+                    ${JSON.stringify(devotee)},
+                    ${JSON.stringify(transactionsByTransId[pj.transId] || [])}
+                  )'>
+                  View
+                </button>
+            </td>
+        `;
+		tbody.appendChild(tr);
+	});
+}
+function openPoojaModal(pj, v, pts) {
+	const modal = document.getElementById("poojaModal");
+	const content = document.getElementById("modalContent");
+
+	let ptRows = pts.map(pt => `
+        <tr class="border-b">
+          <td class="py-1">${pt.poojaMaster.name}</td>
+          <td class="py-1 text-right">₹${pt.amount}</td>
+        </tr>
+    `).join("");
+
+	content.innerHTML = `
+        <div><strong>Devotee:</strong> ${v.fullName}</div>
+        <div><strong>Mobile:</strong> ${v.mobile}</div>
+        <div><strong>Booking Date:</strong> ${pj.bookingDate}</div>
+        <div><strong>Advance:</strong> ₹${pj.advanceAmount}</div>
+
+        <div class="mt-3">
+          <table class="w-full text-sm border">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="text-left px-2 py-1">Pooja</th>
+                <th class="text-right px-2 py-1">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${ptRows}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="text-right font-semibold mt-2">
+          Total: ₹${pj.amount}
+        </div>
+    `;
+
+	modal.classList.remove("hidden");
+	modal.classList.add("flex");
+}
+function closePoojaModal() {
+	const modal = document.getElementById("poojaModal");
+	modal.classList.add("hidden");
+	modal.classList.remove("flex");
+}
+
 /* =======================
    Init
 ======================= */
-console.log(3)
 $(function() {
 	initCharts();
 	loadDashboard();
+	loadBooking();
 });

@@ -148,22 +148,25 @@ public class PoojaService {
 		pooja.setBookingCloseDate(dto.getCloseDate());
 		
 		String transId = SiteHelper.transId("adv");
-		Long vendorAccountId = dto.getVendorAccId();
-//		LocalDateTime c = dto.getCloseDate().now();
-		
-		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, vendorAccountId, dto.getPayMode(), 
-				dto.getPayingAmount(), dto.getCloseDate().atTime(LocalTime.now()), dto.getRemark(), TransactionType.RECEIPT,
-				TransactionStatus.ACTIVE, transId, dto.getReferenceDate(), dto.getReferenceNumber()), tenantId, userId);
-
+//		Long vendorAccountId = dto.getVendorAccId();
+//		Long poojaAdvanceLedger = 12l;
 		Long poojaIncomeLedger = 11l;
-		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, poojaIncomeLedger, vendorAccountId,
-				dto.getPayingAmount(), dto.getCloseDate().atTime(LocalTime.now()), dto.getRemark(), TransactionType.RECEIPT,
-				TransactionStatus.ACTIVE, transId, dto.getReferenceDate(), dto.getReferenceNumber()), tenantId, userId);
+//		LocalDateTime c = dto.getCloseDate().now();
+//		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, dto.getPayMode(), vendorAccountId,
+//				dto.getPayingAmount(), dto.getCloseDate().atTime(LocalTime.now()), dto.getRemark(), TransactionType.RECEIPT,
+//				TransactionStatus.ACTIVE, transId, dto.getReferenceDate(), dto.getReferenceNumber()), tenantId, userId);
+//
+//		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, vendorAccountId, poojaIncomeLedger,
+//				dto.getPayingAmount(), dto.getCloseDate().atTime(LocalTime.now()), dto.getRemark(), TransactionType.RECEIPT,
+//				TransactionStatus.ACTIVE, transId, dto.getReferenceDate(), dto.getReferenceNumber()), tenantId, userId);
+//		
+//		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, poojaAdvanceLedger, poojaIncomeLedger,
+//				dto.getOldAdvance(), dto.getCloseDate().atTime(LocalTime.now()), dto.getRemark(), TransactionType.RECEIPT,
+//				TransactionStatus.ACTIVE, transId, dto.getReferenceDate(), dto.getReferenceNumber()), tenantId, userId);	
 		
-		Long poojaAdvanceLedger = 12l;
-		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, poojaAdvanceLedger, poojaIncomeLedger,
-				dto.getOldAdvance(), dto.getCloseDate().atTime(LocalTime.now()), dto.getRemark(), TransactionType.RECEIPT,
-				TransactionStatus.ACTIVE, transId, dto.getReferenceDate(), dto.getReferenceNumber()), tenantId, userId);		
+		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, poojaIncomeLedger, dto.getPayMode(),
+		dto.getPayingAmount(), dto.getCloseDate().atTime(LocalTime.now()), dto.getRemark(), TransactionType.RECEIPT,
+		TransactionStatus.ACTIVE, transId, dto.getReferenceDate(), dto.getReferenceNumber()), tenantId, userId);		
 	}
 
 	@Transactional

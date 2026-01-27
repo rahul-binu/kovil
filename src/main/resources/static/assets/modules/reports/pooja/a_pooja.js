@@ -261,10 +261,16 @@ $("#excelExportPooja").click(function() {
 		columnWidths: colWidths
 	});
 });
+let ptid = "";
+$("#confirmPrint").on("change", function () {
+	printPoojaTransaction(ptid);
+	
+});
 
 function printPoojaTransaction(id) {
-
-	$("#printFrame").attr("src", `/web/pooja/receipt/0/${id}`)
+	ptid = id;
+	let ism = $("#confirmPrint").is(":checked")==true ? 1 : 0;
+	$("#printFrame").attr("src", `/web/pooja/receipt/0/${id}/${ism}`);
 	$("#printModal").removeClass("hidden");
 }
 

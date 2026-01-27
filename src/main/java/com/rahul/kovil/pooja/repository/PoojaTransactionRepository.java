@@ -82,4 +82,10 @@ public interface PoojaTransactionRepository extends JpaRepository<PoojaTransacti
 			@Query("UPDATE PoojaTransaction p SET p.status = :status WHERE p.transId = :tid")
 			void softDelete(String tid, BaseStatus status);
 
+
+			List<PoojaTransaction> findByTransIdIn(List<String> tids);
+
+
+			
+
 }

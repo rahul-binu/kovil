@@ -16,55 +16,54 @@
 			font-family: "Noto Sans Malayalam", sans-serif;
 		}
 
+		/* PAGE */
 		.html-page-wrapper {
 			width: 210mm;
 			height: 297mm;
 			display: flex;
 			flex-direction: column;
 			page-break-after: always;
-			/* 🔥 THIS IS KEY */
 		}
 
-
-		/* EACH RECEIPT */
+		/* EACH RECEIPT (4 × per page) */
 		.html-receipt {
-			height: 99mm;
+			height: 74.25mm;
+			/* 297 / 4 */
 			width: 100%;
 			box-sizing: border-box;
-			padding: 10mm;
+			padding: 6mm;
 			border-bottom: 1px dashed #000;
 		}
 
-		/* CERTIFICATE BORDER BOX */
+		/* OUTER BORDER BOX */
 		.html-box {
 			height: 100%;
 			position: relative;
-			padding: 4px;
-			/* as requested */
+			padding: 2px;
 			box-sizing: border-box;
-			border: 3px solid rgb(53, 132, 228);
+			border: 2.5px solid rgb(53, 132, 228);
 		}
 
 		/* INNER SOLID BORDER */
 		.html-box::before {
 			content: "";
 			position: absolute;
-			top: 10px;
-			left: 10px;
-			right: 10px;
-			bottom: 10px;
-			border: 1.5px solid rgb(28, 113, 216);
+			top: 5px;
+			left: 5px;
+			right: 5px;
+			bottom: 5px;
+			border: 1.2px solid rgb(28, 113, 216);
 			pointer-events: none;
 		}
 
-		/* INNER DOTTED DECOR */
+		/* INNER DOTTED BORDER */
 		.html-box::after {
 			content: "";
 			position: absolute;
-			top: 16px;
-			left: 16px;
-			right: 16px;
-			bottom: 16px;
+			top: 11px;
+			left: 11px;
+			right: 11px;
+			bottom: 11px;
 			border: 1px dotted rgb(98, 160, 234);
 			pointer-events: none;
 		}
@@ -72,27 +71,32 @@
 		/* LOGO */
 		.html-logo {
 			position: absolute;
-			top: 18px;
-			/* pushed inward to avoid borders */
-			left: 18px;
-			width: 90px;
+			top: 12px;
+			left: 12px;
+			width: 65px;
 		}
 
 		/* HEADER */
 		.html-header {
-			padding-top: 18px;
-			padding-right: 18px;
-			padding-left: 18px;
+			padding-top: 12px;
+			padding-right: 12px;
+			padding-left: 12px;
 			text-align: center;
 			font-weight: bold;
-			font-size: 18px;
-			line-height: 1.4;
+			font-size: 15px;
+			line-height: 1.35;
 		}
 
+		.rep-address{
+			text-align: center;
+			font-weight: bold;
+			font-size: 12px;
+		}
+		
 		/* SUB TITLE */
 		.html-sub-title {
-			background: #002d88;
-			color: #fff;
+			/*background: rgb(0, 0, 0);
+			color: #fff;*/
 			display: inline-block;
 			padding: 2px 10px;
 			margin-top: 5px;
@@ -100,12 +104,12 @@
 			border-radius: 3px;
 		}
 
-		/* ROWS */
+		/* CONTENT ROWS */
 		.html-row {
-			padding-right: 18px;
-			padding-left: 18px;
-			margin-top: 12px;
-			font-size: 16px;
+			padding-right: 12px;
+			padding-left: 12px;
+			margin-top: 8px;
+			font-size: 14px;
 		}
 
 		.html-field label {
@@ -128,17 +132,25 @@
 		/* FOOTER */
 		.html-amount-box {
 			position: absolute;
-			bottom: 26px;
-			left: 18px;
-			font-size: 18px;
+			bottom: 15px;
+			left: 14px;
+			font-size: 16px;
+			font-weight: bold;
+		}
+
+		.html-wamount-box {
+			position: absolute;
+			bottom: 15px;
+			left: 120px;
+			font-size: 16px;
 			font-weight: bold;
 		}
 
 		.html-treasurer {
 			position: absolute;
-			bottom: 26px;
-			right: 22px;
-			font-size: 16px;
+			bottom: 18px;
+			right: 16px;
+			font-size: 14px;
 		}
 	</style>
 </head>
@@ -149,6 +161,7 @@
 
 	</div>
 	<input type="hidden" id="transid" th:value="${transid}">
+	<input type="hidden" id="isMalayalam" th:value="${ism}">
 
 	<script th:src="@{/assets/common/js/app.js}"></script>
 	<script th:src="@{/assets/lib/jquery-3.7.1.min.js}"></script>
@@ -163,24 +176,24 @@
 					"Authorization": "Bearer " + localStorage.getItem("jwtToken")
 				}
 			})
-			.then(res => {
-			    if (!res.ok) {
-			        throw new Error(`HTTP error! Status: ${res.status}`);
-			    }
-			    return res.json();
-			})
-			.then(data => {
-				preparePrint(data);
-			})
-			.catch(err => {
-			    console.error("Fetch failed:", err);
-			});
-			
+				.then(res => {
+					if (!res.ok) {
+						throw new Error(`HTTP error! Status: ${res.status}`);
+					}
+					return res.json();
+				})
+				.then(data => {
+					preparePrint(data);
+				})
+				.catch(err => {
+					console.error("Fetch failed:", err);
+				});
+
 		});
 
 
 		function preparePrint(data) {
-			const PER_PAGE = 3;
+			const PER_PAGE = 4;
 			let page;
 
 			for (let i = 0; i < data.poojat.length; i++) {
@@ -198,9 +211,9 @@
 					rNo: pt.prefix.replace(/@n@/i, pt.receiptNo),
 					dt: formatDateTime(pj.date),
 					dname: vn.fullName,
-					dadd: vn.familyName+" "+vn.address,
+					dadd: vn.familyName + " " + vn.address,
 					naksh: vn.nakshathra,
-					amt: formatINR(pt.amount),
+					amt: pt.amount,
 					poojaT: pm.name
 				}));
 			}
@@ -217,6 +230,52 @@
 				amt = "0.0",
 				poojaT = "Pooja"
 			} = data;
+			if ($("#isMalayalam").val() == '0') {
+
+				return `
+				    <div class="html-receipt">
+				        <div class="html-box">
+
+				            <img src="/dynamic/assets/app_images/default_images/ayyappan_logo-removebg-preview.png"
+				                 class="html-logo" alt="Logo">
+
+				            <div class="html-header">
+							SREE PRANCHERI KANDAN SASTHA KSHETRAM, <br>
+				            <span class="rep-address">S. T. Mankad. Kanyakumari Dist. Mob : 9442 401 458</span><br>
+				                <span class="html-sub-title">${poojaT} Receipt</span>
+				            </div>
+
+				            <div class="html-row html-field">
+				                <label>Number:</label>
+				                <span class="html-red">${rNo}</span>
+				                <span style="float:right;">Date: ${dt}</span>
+				            </div>
+
+				            <div class="html-row html-field">
+				                <label>Name:</label>
+				                <span class="html-line">${dname}</span>
+				            </div>
+
+				            <div class="html-row html-field">
+				                <label>Address:</label>
+				                <span class="html-line">${dadd}</span>
+				            </div>
+
+				            <div class="html-row html-field">
+				                <label>Nakshatra:</label>
+				                <span class="html-line">${naksh}</span>
+				            </div>
+
+				            <div class="html-amount-box">Rs. ${formatINR(amt)}/-</div>
+							
+							<div class="html-wamount-box">${amountToWords(amt)}/-</div>
+							
+				            <div class="html-treasurer">Treasurer</div>
+
+				        </div>
+				    </div>
+				`;
+			}
 
 			return `
 	        <div class="html-receipt">
@@ -226,8 +285,9 @@
 	                     class="html-logo" alt="Logo">
 
 	                <div class="html-header">
-					ശ്രീ പ്രാഞ്ചേരി കണ്ഠൻ ശാസ്താ ക്ഷേത്രം <br>
-	                    			എസ്. റ്റി മങ്കാട്<br>
+					ശ്രീ പ്രാഞ്ചേരി കണ്ഠൻ ശാസ്താ ക്ഷേത്രം, 
+	                    			എസ്. റ്റി. മങ്കാട്.<br>
+						<span class="rep-address">S. T. Mankad. Kanyakumari Dist. Mob : 9442 401 458</span><br>
 	                    <span class="html-sub-title">${poojaT} രസീത്</span>
 	                </div>
 
@@ -252,7 +312,10 @@
 	                    <span class="html-line">${naksh}</span>
 	                </div>
 
-	                <div class="html-amount-box">Rs. ${amt}/-</div>
+					<div class="html-amount-box">Rs. ${formatINR(amt)}/-</div>
+
+					<div class="html-wamount-box">${amountToWords(amt)}/-</div>
+					
 	                <div class="html-treasurer">Treasurer</div>
 
 	            </div>

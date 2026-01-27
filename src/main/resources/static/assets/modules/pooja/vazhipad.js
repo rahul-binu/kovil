@@ -162,6 +162,16 @@ function clearPoojaFields() {
 
 let choosedPoojas = [];
 $("#addPoojaBtn").click(function() {
+	addPoojaToList();
+});
+
+$("#addPoojaBtn").keyup(function (e) {
+    if(e.which==13){
+		addPoojaToList();
+	}
+});
+
+function addPoojaToList(){
 	let pooja = $("#poojaMaster").val();
 	let errors = [];
 	if (pooja == null || pooja == "") {
@@ -177,8 +187,8 @@ $("#addPoojaBtn").click(function() {
 	choosedPoojas.push({ pooja: pooja, amount: amount, prefix: prefix });
 	chosenPoojaTable();
 	clearPoojaFields();
-});
-
+	$("#poojaMaster").focus();
+}
 function chosenPoojaTable() {
 	$("#chosenPoojaDetailsTable tbody").html("");
 
@@ -235,12 +245,13 @@ $("#savePooja").click(function() {
 		showErrors(errors, ".errorAppendArea");
 		return;
 	}
-	openUniversalConfirmModal({
+	/*openUniversalConfirmModal({
 		title: "Save Pooja?",
 		message: "Do you want to save this pooja?",
 		actionText: "Save",
 		onConfirm: savePooja
-	});
+	});*/
+	savePooja();
 });
 
 function savePooja() {
@@ -326,9 +337,14 @@ function bookingDisabled() {
 function getPoojaMasterData(id, fl) {
 	return objPoojaMasterData[id]?.[fl];
 }
-
+let ptid = "";
+$("#confirmPrint").on("change", function () {
+	openPrintModal(ptid);
+});
 function openPrintModal(tid = "pja.260104120217.96959e") {
-	$("#printFrame").attr("src", `/web/pooja/receipt/0/${tid}`)
+	ptid = tid;
+	let ism = $("#confirmPrint").is(":checked")==true ? 1 : 0;
+	$("#printFrame").attr("src", `/web/pooja/receipt/0/${tid}/${ism}`);
 	$("#printModal").removeClass("hidden");
 }
 

@@ -60,7 +60,8 @@ public class WebController {
 	}
 
 	@GetMapping("/auth/dashboard")
-	public String dashboard() {
+	public String dashboard(Model m) {
+		m.addAttribute("today", LocalDate.now().plusDays(1));
 		return "modules/others/dashboard";
 	}
 
@@ -83,9 +84,10 @@ public class WebController {
 		return "modules/pooja/poojamaster";
 	}
 
-	@GetMapping("/pooja/receipt/{id}/{tid}")
-	public String poojaHtmlPrint(@PathVariable int id, @PathVariable String tid, Model model) {
+	@GetMapping("/pooja/receipt/{id}/{tid}/{ism}")
+	public String poojaHtmlPrint(@PathVariable int id, @PathVariable String tid, @PathVariable int ism, Model model) {
 		model.addAttribute("transid", tid);
+		model.addAttribute("ism", ism);
 		if(id == 1) {
 			return "modules/pooja/print/receiptprint1";
 		}

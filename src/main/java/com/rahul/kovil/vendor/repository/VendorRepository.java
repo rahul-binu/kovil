@@ -33,4 +33,6 @@ public interface VendorRepository extends JpaRepository<Vendor, Long>{
 
 	
 	Vendor findByTransId(String transId);
+
+	List<Vendor> findByTransIdIn(List<String> vids);
 }

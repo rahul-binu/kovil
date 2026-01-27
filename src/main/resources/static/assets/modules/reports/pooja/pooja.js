@@ -273,8 +273,7 @@ $("#excelExportPooja").click(function() {
 });
 
 function printPoojaTransaction(id){
-
-	$("#printFrame").attr("src", `/web/pooja/receipt/0/${id}`)
+	$("#printFrame").attr("src", `/web/pooja/receipt/0/${id}`);
 	$("#printModal").removeClass("hidden");
 }
 

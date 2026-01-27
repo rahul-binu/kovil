@@ -521,3 +521,66 @@ function formatINR(amount) {
 	return "₹" + Number(amount).toLocaleString("en-IN");
 }
 
+
+function amountToWords(amount) {
+    if (typeof amount !== "number" || isNaN(amount)) {
+        throw new Error("Input must be a valid number");
+    }
+
+    if (amount === 0) return "Zero Rupees";
+
+    const ones = [
+        "", "One", "Two", "Three", "Four", "Five",
+        "Six", "Seven", "Eight", "Nine", "Ten",
+        "Eleven", "Twelve", "Thirteen", "Fourteen",
+        "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"
+    ];
+
+    const tens = [
+        "", "", "Twenty", "Thirty", "Forty",
+        "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
+    ];
+
+    function twoDigits(n) {
+        if (n < 20) return ones[n];
+        return tens[Math.floor(n / 10)] + (n % 10 ? " " + ones[n % 10] : "");
+    }
+
+    function threeDigits(n) {
+        let str = "";
+        if (n >= 100) {
+            str += ones[Math.floor(n / 100)] + " Hundred";
+            if (n % 100) str += " ";
+        }
+        str += twoDigits(n % 100);
+        return str.trim();
+    }
+
+    let rupees = Math.floor(amount);
+    let paise = Math.round((amount - rupees) * 100);
+
+    let words = "";
+
+    const crore = Math.floor(rupees / 10000000);
+    rupees %= 10000000;
+
+    const lakh = Math.floor(rupees / 100000);
+    rupees %= 100000;
+
+    const thousand = Math.floor(rupees / 1000);
+    rupees %= 1000;
+
+    if (crore) words += threeDigits(crore) + " Crore ";
+    if (lakh) words += threeDigits(lakh) + " Lakh ";
+    if (thousand) words += threeDigits(thousand) + " Thousand ";
+    if (rupees) words += threeDigits(rupees) + " ";
+
+    words = words.trim() + " Rupees";
+
+    if (paise > 0) {
+        words += " and " + twoDigits(paise) + " Paise";
+    }
+
+    return words;
+}
+
