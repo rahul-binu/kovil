@@ -55,44 +55,8 @@
 					class="clear-input move-next w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
 					th:value="${today}">
 			</div>
-			<div class="relative">
-				<label for="fullName" class="block text-gray-700 font-medium mb-1">Full Name</label>
-				<input type="text" id="fullName" name="fullName"
-					class="clear-input move-next w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
-					placeholder="Enter Full Name">
-				<div id="customerResults" class="hidden"></div>
-			</div>
-			<div>
-				<label for="familyName" class="block text-gray-700 font-medium mb-1">Phone Number</label>
-				<input type="text" id="phoneNumber" name="phoneNumber"
-					class="clear-input move-next w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
-					placeholder="Enter Phone Number">
-			</div>
-			<div>
-				<label for="familyName" class="block text-gray-700 font-medium mb-1">Family Name</label>
-				<input type="text" id="familyName" name="familyName"
-					class="clear-input move-next w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
-					placeholder="Enter Family Name">
-			</div>
-			<div>
-				<label for="address" class="block text-gray-700 font-medium mb-1">Address</label>
-				<input type="text" id="address" name="address"
-					class="clear-input move-next w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
-					placeholder="Enter Address">
-			</div>
-		</div>
-
-		<div class="grid grid-cols-6 gap-6">
-
-			<div class="relative">
-				<label class="block text-gray-700 font-medium mb-1">Nakshatram</label>
-				<select id="nakshatra" name="nakshatra"
-					class="w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400">
-					<option value="">Choose Nakshathram</option>
-				</select>
-			</div>
-
-			<div class="relative">
+			
+			<div class="relative col-span-2">
 				<label class="block text-gray-700 font-medium mb-1">Pooja/Offerings</label>
 				<select id="poojaMaster" name="poojaMaster"
 					class="move-next w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400 pooja-fields">
@@ -109,30 +73,62 @@
 				<label for="poojaAmount" class="block text-gray-700 font-medium mb-1">Amount</label>
 				<input type="text" id="poojaAmount" name="poojaAmount"
 					class="pooja-fields w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400 no-drop-color"
-					value="0">
+					value="0" readonly>
 			</div>
+		</div>
 
+		<div class="grid grid-cols-7 gap-4">
+			<div class="relative col-span-2">
+				<label for="fullName" class="block text-gray-700 font-medium mb-1">Devotee Full Name</label>
+				<input type="text" id="fullName" name="fullName"
+					class="devotee-fields move-next w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
+					placeholder="Enter Full Name">
+				<div id="customerResults" class="hidden"></div>
+			</div>
 			<div>
-				<label class="block text-gray-700 font-medium mb-1">Total Amount</label>
-				<input type="text" id="totalAmount"
-					class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400 no-drop"
-					placeholder="0">
+				<label for="phoneNumber" class="block text-gray-700 font-medium mb-1">Phone Number</label>
+				<input type="text" id="phoneNumber" name="phoneNumber"
+					class="devotee-fields move-next w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
+					placeholder="Enter Phone Number">
 			</div>
-			<div class="col-span-1 flex items-end space-x-3">
-
-				<button id="addPoojaBtn"
+			<div>
+				<label for="familyName" class="block text-gray-700 font-medium mb-1">Family Name</label>
+				<input type="text" id="familyName" name="familyName"
+					class="devotee-fields move-next w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
+					placeholder="Enter Family Name">
+			</div>
+			<div>
+				<label for="address" class="block text-gray-700 font-medium mb-1">Address</label>
+				<input type="text" id="address" name="address"
+					class="devotee-fields move-next w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400"
+					placeholder="Enter Address">
+			</div>
+			<div class="relative">
+				<label class="block text-gray-700 font-medium mb-1">Nakshatram</label>
+				<select id="nakshatra" name="nakshatra"
+					class="w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400">
+					<option value="">Choose Nakshathram</option>
+				</select>
+			</div>
+			<div class="col-span-1 flex items-end space-x-2">
+				<button id="addDevoteeBtn"
 					class="move-next px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 shadow">
 					✓
 				</button>
-
-				<button id="clearPoojaFields"
+				<button id="clearDevoteeFields"
 					class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 shadow">
 					✕
 				</button>
 			</div>
 		</div>
 
-		<div class="grid grid-cols-6 gap-6 " id="paymodeAppendBlock">
+		<div class="grid grid-cols-7 gap-6 " id="paymodeAppendBlock">
+			<div>
+				<label class="block text-gray-700 font-medium mb-1">Total Amount</label>
+				<input type="text" id="totalAmount"
+					class="clear-input w-full px-3 py-2 border rounded-md focus:ring focus:border-indigo-400 no-drop"
+					placeholder="0" readonly>
+			</div>
 			<div>
 				<label for="payingAmount" id="payingAmountLabel" class="block text-gray-700 font-medium mb-1">Paying
 					Amount</label>
@@ -182,12 +178,13 @@
 			<div class="errorAppendArea"></div>
 		</div>
 		<div class="" id="chosenPoojaDetailsBlock">
-			<table class="app-table" id="chosenPoojaDetailsTable">
+			<table class="app-table" id="chosenDevoteeDetailsTable">
 				<thead>
 					<tr>
 						<th>#</th>
-						<th>Pooja Name</th>
-						<th>Prefix</th>
+						<th>Devotee Name</th>
+						<th>Nakshatram</th>
+						<th>Phone</th>
 						<th>Amount</th>
 						<th>Action</th>
 					</tr>

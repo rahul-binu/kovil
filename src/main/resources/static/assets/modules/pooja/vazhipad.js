@@ -151,85 +151,99 @@ $("#poojaMaster").on("change", function() {
 	$("#poojaPrefixPrefix").val(prefix);
 });
 
-$("#clearPoojaFields").click(function() {
-	clearPoojaFields();
+$("#clearDevoteeFields").click(function() {
+	clearDevoteeFields();
 });
 
-function clearPoojaFields() {
-	$(".pooja-fields").val(0);
-	poojaMasterChoice.setChoiceByValue("");
+function clearDevoteeFields() {
+	$(".devotee-fields").val("");
+	if (nakshatraChoice) nakshatraChoice.setChoiceByValue("");
 }
 
-let choosedPoojas = [];
-$("#addPoojaBtn").click(function() {
-	addPoojaToList();
+let choosedDevotees = [];
+$("#addDevoteeBtn").click(function() {
+	addDevoteeToList();
 });
 
-$("#addPoojaBtn").keyup(function (e) {
+$("#addDevoteeBtn").keyup(function (e) {
     if(e.which==13){
-		addPoojaToList();
+		addDevoteeToList();
 	}
 });
 
-function addPoojaToList(){
+function addDevoteeToList(){
+	let fname = $("#fullName").val();
 	let pooja = $("#poojaMaster").val();
 	let errors = [];
 	if (pooja == null || pooja == "") {
-		errors.push("Choose a pooja");
+		errors.push("Choose a pooja first");
+	}
+	if (fname == null || fname == "") {
+		errors.push("Enter Devotee Full Name");
 	}
 	if (errors.length > 0) {
 		showErrors(errors, ".errorAppendArea");
 		return;
 	}
 
-	let amount = toSafeNumber($("#poojaAmount").val());
-	let prefix = $("#poojaPrefixPrefix").val();
-	choosedPoojas.push({ pooja: pooja, amount: amount, prefix: prefix });
-	chosenPoojaTable();
-	clearPoojaFields();
-	$("#poojaMaster").focus();
-}
-function chosenPoojaTable() {
-	$("#chosenPoojaDetailsTable tbody").html("");
+	let devotee = {
+		vendorId: $("#vendorId").val(),
+		vendorAccountId: $("#vendorAccountId").val(),
+		fullName: $("#fullName").val(),
+		phoneNumber: $("#phoneNumber").val(),
+		familyName: $("#familyName").val(),
+		address: $("#address").val(),
+		nakshatra: $("#nakshatra").val()
+	};
 
+	choosedDevotees.push(devotee);
+	chosenDevoteeTable();
+	clearDevoteeFields();
+	$("#fullName").focus();
+}
+
+function chosenDevoteeTable() {
+	$("#chosenDevoteeDetailsTable tbody").html("");
+
+	let poojaAmount = toSafeNumber($("#poojaAmount").val());
 	let totalAmount = 0;
 
 	let tbl = "";
-	choosedPoojas.forEach((e, i) => {
+	choosedDevotees.forEach((e, i) => {
 		tbl += `
             <tr>
                 <td>${i + 1}</td>
-                <td>${getPoojaMasterData(e.pooja, "name")}</td>
-				<td>${e.prefix}</td>
-				<td>${e.amount}</td>
+                <td>${e.fullName}</td>
+				<td>${e.nakshatra}</td>
+				<td>${e.phoneNumber}</td>
+				<td>${poojaAmount}</td>
                 <td>
                     <i class="fa-solid fa-trash text-red-600 cursor-pointer hover:text-red-800"
-                       onclick="deletePoojaRow(${i})"></i>
+                       onclick="deleteDevoteeRow(${i})"></i>
                 </td>
             </tr>
         `;
-		totalAmount += e.amount;
+		totalAmount += poojaAmount;
 	});
 
-	$("#chosenPoojaDetailsTable tbody").html(tbl);
-
+	$("#chosenDevoteeDetailsTable tbody").html(tbl);
 	$("#payingAmount, #totalAmount").val(totalAmount);
 }
 
-function deletePoojaRow(i) {
-	choosedPoojas.splice(i, 1);
-	chosenPoojaTable();
+function deleteDevoteeRow(i) {
+	choosedDevotees.splice(i, 1);
+	chosenDevoteeTable();
 }
 
 
 $("#savePooja").click(function() {
 	let errors = [];
-	let fname = $("#fullName").val();
-	if (fname == "") {
-		errors.push("Please enter a name");
+	let pooja = $("#poojaMaster").val();
+	if (pooja == null || pooja == "") {
+		errors.push("Choose a pooja");
 	}
-	if (choosedPoojas.length == 0) {
-		errors.push("Select atleast one pooja");
+	if (choosedDevotees.length == 0) {
+		errors.push("Add at least one devotee");
 	}
 	if (document.getElementById("poojaBooking").checked && $("#poojaBookingDate").val() == '') {
 		errors.push("Select booking date");
@@ -237,76 +251,80 @@ $("#savePooja").click(function() {
 	if (toSafeNumber($("#payModeChosen").val()) == 0) {
 		errors.push("Chose any paymode");
 	}
-	if ($("#phoneNumber").val().length != 10) {
-
-	}
 
 	if (errors.length > 0) {
 		showErrors(errors, ".errorAppendArea");
 		return;
 	}
-	/*openUniversalConfirmModal({
-		title: "Save Pooja?",
-		message: "Do you want to save this pooja?",
-		actionText: "Save",
-		onConfirm: savePooja
-	});*/
-	savePooja();
+	saveBulkPooja();
 });
 
-function savePooja() {
-	let data = {
-		vendorId: $("#vendorId").val(),
-		vendorName: $("#fullName").val(),
-		vendorPhone: $("#phoneNumber").val(),
-		vendorFamilyName: $("#familyName").val(),
-		venodrAddress: $("#address").val(),
-		vendorNakshatra: $("#nakshatra").val(),
-		
-		vendorAccountId: $("#vendorAccountId").val(),
+function saveBulkPooja() {
+	let poojaMasterId = $("#poojaMaster").val();
+	let poojaAmount = toSafeNumber($("#poojaAmount").val());
+	let poojaPrefix = $("#poojaPrefixPrefix").val();
+	let poojaDate = $("#poojaDate").val();
+	let paymode = $("#payModeChosen").val();
+	
+	let totalAmountVal = toSafeNumber($("#totalAmount").val());
+	let payingAmountVal = toSafeNumber($("#payingAmount").val());
+	
+	// Apportion the advance across devotees if booked
+	let apportionedAdvance = payingAmountVal / choosedDevotees.length;
 
-		paymode: $("#payModeChosen").val(),
+	let offerings = choosedDevotees.map(devotee => {
+		return {
+			vendorId: devotee.vendorId,
+			vendorAccountId: devotee.vendorAccountId,
+			vendorName: devotee.fullName,
+			vendorPhone: devotee.phoneNumber,
+			vendorFamilyName: devotee.familyName,
+			venodrAddress: devotee.address,
+			vendorNakshatra: devotee.nakshatra,
+			
+			paymode: paymode,
+			
+			pooja: {
+				id: null,
+				user: null,
+				transId: null,
+				devotee: devotee.vendorId,
+				date: poojaDate,
+				amount: poojaAmount,
+				status: "ACTIVE"
+			},
+			
+			bookingStatus: document.getElementById("poojaBooking").checked ? "ACTIVE" : "NONE",
+			booking: document.getElementById("poojaBooking").checked,
+			bookingDate: $("#poojaBookingDate").val(),
+			advanceAmount: document.getElementById("poojaBooking").checked ? apportionedAdvance : 0,
 
-		pooja: {
-			id: null,
-			user: null,
-			transId: null,
-			devotee: $("#vendorId").val(),
-			date: $("#poojaDate").val(),
-			amount: toSafeNumber($("#totalAmount").val()),
-			status: "ACTIVE"
-		},
+			poojaTrans: [{
+				id: null,
+				pooja: null,
+				transId: null,
+				poojaMaster: { "id": poojaMasterId },
+				amount: poojaAmount,
+				prefix: poojaPrefix,
+				status: "ACTIVE"
+			}]
+		};
+	});
 
-		bookingStatus: document.getElementById("poojaBooking").checked ? "ACTIVE" : "NONE",
-		booking: document.getElementById("poojaBooking").checked,
-		bookingDate: $("#poojaBookingDate").val(),
-		advanceAmount: document.getElementById("poojaBooking").checked ? toSafeNumber($("#payingAmount").val()) : 0,
+	console.log("Posting Bulk Offering Data:", offerings);
 
-		poojaTrans: choosedPoojas.map(p => ({
-			id: null,
-			pooja: null,
-			transId: null,
-			poojaMaster: { "id": p.pooja },
-			amount: p.amount,
-			prefix: p.prefix,
-			status: "ACTIVE"
-		}))
-	};
-
-	console.log("Posting Offering Data:", data);
-
-	fetch("/api/pooja/offering", {
+	fetch("/api/pooja/offering/bulk", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 			"Authorization": localStorage.getItem("jwtToken")
 		},
-		body: JSON.stringify(data)
+		body: JSON.stringify(offerings)
 	})
 		.then(r => r.json())
 		.then(res => {
 			console.log("Saved:", res);
-			openPrintModal(res.transId);
+			openPrintModal(res.transIds);
 			// success toast or redirect
 		})
 		.catch(err => console.error("Error:", err));

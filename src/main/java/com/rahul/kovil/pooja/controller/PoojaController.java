@@ -84,6 +84,21 @@ public class PoojaController {
 		return ResponseEntity.ok(poojaService.saveOffering(offering, tenantId, userId));
 	}
 
+	@PostMapping("/offering/bulk")
+	public ResponseEntity<?> saveBulkOffering(@RequestHeader("Authorization") String token,
+			@RequestBody List<OfferingDto> offerings) {
+		String tenantId = jwt.getTenantId(token);
+		String userId = jwt.getUserId(token);
+		
+		List<String> transIds = new java.util.ArrayList<>();
+		for (OfferingDto offering : offerings) {
+			OfferingDto saved = poojaService.saveOffering(offering, tenantId, userId);
+			transIds.add(saved.getTransId());
+		}
+		
+		return ResponseEntity.ok(java.util.Map.of("transIds", String.join(",", transIds)));
+	}
+
 	@PostMapping("/advance-close")
 	public ResponseEntity<ApiResponse> makePayment(@RequestHeader("Authorization") String token,
 			@RequestBody PoojaAdvanceCloseRequestDto dto) {

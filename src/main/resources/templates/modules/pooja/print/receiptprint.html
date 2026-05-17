@@ -183,7 +183,11 @@
 					return res.json();
 				})
 				.then(data => {
-					preparePrint(data);
+					if (Array.isArray(data)) {
+						data.forEach(d => preparePrint(d));
+					} else {
+						preparePrint(data);
+					}
 				})
 				.catch(err => {
 					console.error("Fetch failed:", err);

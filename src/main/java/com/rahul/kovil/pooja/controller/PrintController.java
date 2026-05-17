@@ -18,8 +18,16 @@ public class PrintController {
 		this.printService = printService;
 	}
 	
-	@GetMapping("/pooja/{tid}")
-	public ResponseEntity<?> poojaRreceiptPrint(@PathVariable String tid){
-		return ResponseEntity.ok(printService.poojaRreceiptPrint(tid));
+	@GetMapping("/pooja/{tids}")
+	public ResponseEntity<?> poojaRreceiptPrint(@PathVariable String tids){
+		if (tids != null && tids.contains(",")) {
+			String[] splitTids = tids.split(",");
+			java.util.List<Object> results = new java.util.ArrayList<>();
+			for (String tid : splitTids) {
+				results.add(printService.poojaRreceiptPrint(tid.trim()));
+			}
+			return ResponseEntity.ok(results);
+		}
+		return ResponseEntity.ok(printService.poojaRreceiptPrint(tids));
 	}
 }

@@ -262,10 +262,10 @@ KEY (tenant_id, user_name)
 VALUES (
     'abcd',
     'System Admin',
-    '$2a$10$mo1dE9nX9PAvATdXK74DSOqvvD/J3FDgn5PnZfL0QGqz67Vy80scO',
+    '$2a$10$nFrkWU2Wt.RL9ex3ITaIEuvAy09bFTsFrHsJ/SNwFH3FmHjjyJzAS',
     'ACTIVE',
     '-1',
-    'admin'
+    'pkst'
 );
 
 
