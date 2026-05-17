@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/app.html}">
+
+<th:block layout:fragment="head">
+	<title>Grouped Pooja Report</title>
+</th:block>
+
+<div layout:fragment="content" class="p-4">
+	<link rel="stylesheet" th:href="@{/assets/lib/simplepagination/simplePagination.css}" />
+
+
+
+	<div class="flex items-center my-10">
+		<div class="flex-grow border-b-2 border-blue-500"></div>
+		<span class="px-4 text-2xl font-bold text-gray-800">Grouped Pooja Report</span>
+		<div class="flex-grow border-b-2 border-blue-500"></div>
+	</div>
+
+
+	<div class="overflow-x-auto mt-2 bg-neutral-primary-soft block border border-default border-t-4 rounded-base shadow-xs"
+		id="poojaReportPaginateArea">
+
+		<!-- Filter Section -->
+		<div class="flex flex-wrap items-center mb-3 mx-2 gap-3 justify-between">
+
+			<!-- Left Side: Filters + Search -->
+			<div class="flex flex-wrap items-center gap-3">
+				<input type="date" id="fromDate" class="border px-3 py-2 rounded-md" th:value="${fo}">
+				<input type="date" id="toDate" class="border px-3 py-2 rounded-md" th:value="${to}">
+				<input id="allSearchBox" class="w-40 px-3 py-2 border rounded-md" placeholder="Search..." />
+				<button id="serchPooja"
+					class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+					Search
+				</button>
+			</div>
+
+			<!-- Right Side: Export -->
+			<div class="flex items-center">
+				<button id="excelExportPooja"
+					class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
+					Export Excel
+				</button>
+			</div>
+
+		</div>
+
+
+		<div class="table-scroll-x">
+			<table id="poojaReportTable" class="app-table table-no-wrap table-sticky-col-1 table-sticky-col-2">
+				<thead></thead>
+				<tbody id="poojaTableBody"></tbody>
+				<tfoot></tfoot>
+			</table>
+		</div>
+
+
+		<div id="pager" class="mt-4 px-3"></div>
+
+	</div>
+
+</div>
+
+<div layout:fragment="scripts">
+	<script th:src="@{/assets/lib/excel/exceljs.min.js}"></script>
+	<script th:src="@{/assets/lib/excel/common.js}"></script>
+
+
+	<script th:src="@{/assets/lib/simplepagination/simplePagination.min.js}"></script>
+	<script th:src="@{/assets/modules/reports/common.js}"></script>
+	<script th:src="@{/assets/modules/reports/pooja/pooja_group.js}"></script>
+</div>

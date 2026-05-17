@@ -107,6 +107,13 @@ public class WebController {
 		return "modules/report/pooja/pooja";
 	}
 	
+	@GetMapping("/report/pooja-group")
+	public String poojaGroupReport(Model model) {
+		model.addAttribute("fo", LocalDate.now().minusDays(1));
+		model.addAttribute("to", LocalDate.now());
+		return "modules/report/pooja/pooja_group";
+	}
+	
 	@GetMapping("/report/pooja-advance")
 	public String poojaAdvanceReport(Model model) {
 		model.addAttribute("fo", LocalDate.now().minusDays(1));
