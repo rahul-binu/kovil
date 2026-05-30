@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,8 @@ import com.rahul.kovil.common.enums.ItemUnitType;
 import com.rahul.kovil.common.util.LicenseStatus;
 import com.rahul.kovil.common.util.LicenseValidation;
 import com.rahul.kovil.config.JwtProvider;
+import com.rahul.kovil.dotmatrix.DotMatrixSampleService;
+
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -59,9 +62,15 @@ public class WebController {
 		return "modules/authentication/login";
 	}
 
+
+//	@Autowired
+//	DotMatrixSampleService dotMatrixSampleService;
+	
 	@GetMapping("/auth/dashboard")
 	public String dashboard(Model m) {
 		m.addAttribute("today", LocalDate.now().plusDays(1));
+//		dotMatrixSampleService.printSampleReceipt();
+		
 		return "modules/others/dashboard";
 	}
 

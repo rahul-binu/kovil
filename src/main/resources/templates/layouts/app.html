@@ -15,6 +15,11 @@
 	<aside th:replace="~{common/sidebar :: aside}"></aside>
 
 	<main class="ml-64 pt-20 sm:pt-16 md:pt-20 lg:pt-[3%] content-wrapper">
+		<!-- Preloader -->
+		<div id="preloader">
+			<div id="preloader_status">&nbsp;</div>
+			<h3 class="preloader-text"></h3>
+		</div>
 		<div layout:fragment="content">
 		</div>
 	</main>
