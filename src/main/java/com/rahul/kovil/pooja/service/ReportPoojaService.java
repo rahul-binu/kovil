@@ -34,7 +34,7 @@ public class ReportPoojaService implements ReportServiceApi {
 			where.append(f).append(" = :").append(param);
 			params.put(param, v);
 		});
-		System.out.println(where);
+		
 		String jpql = "SELECT " + select + " FROM Pooja pj";
 
 		if (!where.isEmpty())
