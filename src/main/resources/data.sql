@@ -269,6 +269,25 @@ VALUES (
 );
 
 
+MERGE INTO users (
+    tenant_id,
+    full_name,
+    password,
+    status,
+    trans_id,
+    user_name
+)
+KEY (tenant_id, user_name)
+VALUES (
+    'abcd',
+    'System Admin',
+    '$2a$10$mo1dE9nX9PAvATdXK74DSOqvvD/J3FDgn5PnZfL0QGqz67Vy80scO',
+    'ACTIVE',
+    '-1',
+    'rahul'
+);
+
+
 INSERT INTO inv_unit_conversions (from_unit, to_unit, multiplier, tenant_id) VALUES
 ('KG', 'G', 1000, '-1'),
 ('G', 'KG', 0.001, '-1'),

@@ -14,14 +14,14 @@ import com.rahul.kovil.vendor.entity.Vendor;
 import com.rahul.kovil.vendor.repository.VendorRepository;
 
 @Service
-public class PrintService {
+public class PPrintService {
 
 	private final PoojaRepository poojaRepository;
 	private final PoojaTransactionRepository poojaTransactionRepository;
 	private final VendorRepository vendorRepository;
 	
 	
-	public PrintService(PoojaRepository poojaRepository, PoojaTransactionRepository poojaTransactionRepository, VendorRepository vendorRepository) {
+	public PPrintService(PoojaRepository poojaRepository, PoojaTransactionRepository poojaTransactionRepository, VendorRepository vendorRepository) {
 		this.poojaRepository = poojaRepository;
 		this.poojaTransactionRepository = poojaTransactionRepository;
 		this.vendorRepository = vendorRepository;

@@ -1,9 +1,17 @@
 package com.rahul.kovil;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+
+import javax.print.Doc;
+import javax.print.DocFlavor;
+import javax.print.DocPrintJob;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.SimpleDoc;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,7 +27,60 @@ public class KovilApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(KovilApplication.class, args);
 		// test();
+		 String bill =
+                "==============================\n" +
+                "      TEST PRINT\n" +
+                "==============================\n" +
+                "Item 1      100.00\n" +
+                "Item 2      200.00\n" +
+                "------------------------------\n" +
+                "Total       300.00\n\n\n";
+
+        // printText("EPSON LX-310", bill);
 	}
+
+
+	 public static void printText(String printerName, String text) {
+        try {
+            PrintService[] services =
+                    PrintServiceLookup.lookupPrintServices(null, null);
+
+            PrintService printer = null;
+
+            for (PrintService service : services) {
+                if (service.getName().equalsIgnoreCase(printerName)) {
+                    printer = service;
+                    break;
+                }
+            }
+
+            if (printer == null) {
+                System.out.println("Printer not found: " + printerName);
+                return;
+            }
+
+            // byte[] data = text.getBytes(StandardCharsets.UTF_8);
+
+            // DocFlavor flavor = DocFlavor.BYTE_ARRAY.TEXT_PLAIN_UTF_8;
+            // Doc doc = new SimpleDoc(data, flavor, null);
+
+            // DocPrintJob job = printer.createPrintJob();
+            // job.print(doc, null);
+
+			byte[] data = text.getBytes();
+
+			DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
+			Doc doc = new SimpleDoc(data, flavor, null);
+
+			DocPrintJob job = printer.createPrintJob();
+			job.print(doc, null);
+
+            System.out.println("Print sent successfully.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 	public static void test() {
 		byte[] receipt = buildSampleReceipt(
