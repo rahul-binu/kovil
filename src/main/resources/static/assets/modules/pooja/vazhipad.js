@@ -7,7 +7,7 @@ let poojaMasterChoice = null;
 
 let objPoojaMasterData;
 
-$(function() {
+$(function () {
 	$("#fullName").focus();
 	getAllPoojaMaster();
 	getAllPoojaNakshatra();
@@ -141,7 +141,7 @@ function selectCustomer(customer) {
 	$("#customerResults").addClass("hidden");
 }
 
-$("#poojaMaster").on("change", function() {
+$("#poojaMaster").on("change", function () {
 	let p = objPoojaMasterData[toSafeNumber($(this).val())];
 	if (p == undefined) return;
 	// fields load
@@ -151,7 +151,7 @@ $("#poojaMaster").on("change", function() {
 	$("#poojaPrefixPrefix").val(prefix);
 });
 
-$("#clearDevoteeFields").click(function() {
+$("#clearDevoteeFields").click(function () {
 	clearDevoteeFields();
 });
 
@@ -161,17 +161,17 @@ function clearDevoteeFields() {
 }
 
 let choosedDevotees = [];
-$("#addDevoteeBtn").click(function() {
+$("#addDevoteeBtn").click(function () {
 	addDevoteeToList();
 });
 
 $("#addDevoteeBtn").keyup(function (e) {
-    if(e.which==13){
+	if (e.which == 13) {
 		addDevoteeToList();
 	}
 });
 
-function addDevoteeToList(){
+function addDevoteeToList() {
 	let fname = $("#fullName").val();
 	let pooja = $("#poojaMaster").val();
 	let errors = [];
@@ -236,7 +236,7 @@ function deleteDevoteeRow(i) {
 }
 
 
-$("#savePooja").click(function() {
+$("#savePooja").click(function () {
 	let errors = [];
 	let pooja = $("#poojaMaster").val();
 	if (pooja == null || pooja == "") {
@@ -265,10 +265,10 @@ function saveBulkPooja() {
 	let poojaPrefix = $("#poojaPrefixPrefix").val();
 	let poojaDate = $("#poojaDate").val();
 	let paymode = $("#payModeChosen").val();
-	
+
 	let totalAmountVal = toSafeNumber($("#totalAmount").val());
 	let payingAmountVal = toSafeNumber($("#payingAmount").val());
-	
+
 	// Apportion the advance across devotees if booked
 	let apportionedAdvance = payingAmountVal / choosedDevotees.length;
 
@@ -281,9 +281,9 @@ function saveBulkPooja() {
 			vendorFamilyName: devotee.familyName,
 			venodrAddress: devotee.address,
 			vendorNakshatra: devotee.nakshatra,
-			
+
 			paymode: paymode,
-			
+
 			pooja: {
 				id: null,
 				user: null,
@@ -293,7 +293,7 @@ function saveBulkPooja() {
 				amount: poojaAmount,
 				status: "ACTIVE"
 			},
-			
+
 			bookingStatus: document.getElementById("poojaBooking").checked ? "ACTIVE" : "NONE",
 			booking: document.getElementById("poojaBooking").checked,
 			bookingDate: $("#poojaBookingDate").val(),
@@ -332,7 +332,7 @@ function saveBulkPooja() {
 
 
 
-$("#poojaBooking").on("change", function() {
+$("#poojaBooking").on("change", function () {
 	if ($(this).is(":checked")) {
 		bookingEnabled();
 	} else {
@@ -361,19 +361,37 @@ $("#confirmPrint").on("change", function () {
 });
 function openPrintModal(tid = "pja.260104120217.96959e") {
 	ptid = tid;
-	let ism = $("#confirmPrint").is(":checked")==true ? 1 : 0;
+	let ism = $("#confirmPrint").is(":checked") == true ? 1 : 0;
 	$("#printFrame").attr("src", `/web/pooja/receipt/0/${tid}/${ism}`);
 	$("#printModal").removeClass("hidden");
 }
 
 function printIframe() {
-    const iframe = document.getElementById("printFrame");
-    const iframeWindow = iframe.contentWindow;
-    iframeWindow.focus();
-    iframeWindow.onafterprint = () => {
-        iframe.src = iframe.src;
-    };
-    iframeWindow.print();
+	if (confirm("Would you like to print using the Dot Matrix printer?\n\nClick OK for Dot Matrix.\nClick Cancel for Normal HTML Print.")) {
+		fetch(`/api/print/dotmatrix/pooja/${ptid}`, {
+			method: "GET",
+			headers: {
+				"Authorization": localStorage.getItem("jwtToken")
+			}
+		})
+			.then(res => res.json())
+			.then(data => {
+				console.log(data);
+				alert("Sent to Dot Matrix Printer.");
+			})
+			.catch(err => {
+				console.error("Error printing to dot matrix:", err);
+				alert("Failed to send to Dot Matrix Printer.");
+			});
+	} else {
+		const iframe = document.getElementById("printFrame");
+		const iframeWindow = iframe.contentWindow;
+		iframeWindow.focus();
+		iframeWindow.onafterprint = () => {
+			iframe.src = iframe.src;
+		};
+		iframeWindow.print();
+	}
 }
 
 function closeModal() {

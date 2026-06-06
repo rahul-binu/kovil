@@ -28,7 +28,6 @@ import com.rahul.kovil.dotmatrix.DotMatrixSampleService;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-
 @Controller
 @RequestMapping("/web")
 public class WebController {
@@ -37,40 +36,39 @@ public class WebController {
 
 	private final AuthService authService;
 
-    private final LicenseValidation licenseService;
-    
-    @Value("${client.name}")
-    private String clientName="";
-    @Value("${client.address}")
-    private String clientAddress = "";
-    
+	private final LicenseValidation licenseService;
+
+	@Value("${client.name}")
+	private String clientName = "";
+	@Value("${client.address}")
+	private String clientAddress = "";
+
 	public WebController(JwtProvider jwtProvider, AuthService authService, LicenseValidation licenseService) {
 		this.jwtProvider = jwtProvider;
 		this.authService = authService;
-        this.licenseService = licenseService;
+		this.licenseService = licenseService;
 	}
 
-    @GetMapping("/license/validate")
-    @ResponseBody
-    public LicenseStatus check() {
-        return licenseService.checkLicense();
-    }
-    
+	@GetMapping("/license/validate")
+	@ResponseBody
+	public LicenseStatus check() {
+		return licenseService.checkLicense();
+	}
+
 	// auth/dash
 	@GetMapping("/auth/login")
 	public String loginForm() {
 		return "modules/authentication/login";
 	}
 
+	@Autowired
+	DotMatrixSampleService dotMatrixSampleService;
 
-//	@Autowired
-//	DotMatrixSampleService dotMatrixSampleService;
-	
 	@GetMapping("/auth/dashboard")
 	public String dashboard(Model m) {
 		m.addAttribute("today", LocalDate.now().plusDays(1));
-//		dotMatrixSampleService.printSampleReceipt();
-		
+		dotMatrixSampleService.printSampleReceipt();
+
 		return "modules/others/dashboard";
 	}
 
@@ -97,32 +95,32 @@ public class WebController {
 	public String poojaHtmlPrint(@PathVariable int id, @PathVariable String tid, @PathVariable int ism, Model model) {
 		model.addAttribute("transid", tid);
 		model.addAttribute("ism", ism);
-		if(id == 1) {
+		if (id == 1) {
 			return "modules/pooja/print/receiptprint1";
 		}
 		return "modules/pooja/print/receiptprint";
 	}
-	
+
 	// reports
 	@GetMapping("/report")
 	public String poojaReportDashboard(Model model) {
 		return "modules/report/report_dashboard";
 	}
-	
+
 	@GetMapping("/report/pooja")
 	public String poojaReport(Model model) {
 		model.addAttribute("fo", LocalDate.now().minusDays(1));
 		model.addAttribute("to", LocalDate.now());
 		return "modules/report/pooja/pooja";
 	}
-	
+
 	@GetMapping("/report/pooja-group")
 	public String poojaGroupReport(Model model) {
 		model.addAttribute("fo", LocalDate.now().minusDays(1));
 		model.addAttribute("to", LocalDate.now());
 		return "modules/report/pooja/pooja_group";
 	}
-	
+
 	@GetMapping("/report/pooja-advance")
 	public String poojaAdvanceReport(Model model) {
 		model.addAttribute("fo", LocalDate.now().minusDays(1));
@@ -131,52 +129,52 @@ public class WebController {
 		model.addAttribute("clientAddress", clientAddress);
 		return "modules/report/pooja/pooja_advance";
 	}
-	
+
 	@GetMapping("/report/a-pooja")
 	public String allPoojaReport(Model model) {
 		model.addAttribute("fo", LocalDate.now().minusDays(1));
 		model.addAttribute("to", LocalDate.now());
 		return "modules/report/pooja/a_pooja";
 	}
-	
-	// accounts 
+
+	// accounts
 	@GetMapping("/accounts/ledgers")
 	public String accountLedger() {
 		return "modules/account/ledger";
 	}
-	
+
 	@GetMapping("/accounts/groups")
 	public String accountGroup() {
 		return "modules/account/group";
 	}
-	
+
 	@GetMapping("/accounts/vouchers/{type}")
-	public String accountVoucher(@PathVariable String type,Model model) {
+	public String accountVoucher(@PathVariable String type, Model model) {
 		model.addAttribute("vtype", type);
 		model.addAttribute("today", LocalDate.now());
 		model.addAttribute("clientName", clientName);
 		model.addAttribute("clientAddress", clientAddress);
 		return "modules/account/voucher";
 	}
-	
+
 	@GetMapping("/accounts/opening-balance")
 	public String accountOpeningBalance(Model model) {
 		model.addAttribute("today", LocalDate.now());
 		return "modules/account/account_opening";
 	}
-	
+
 	@GetMapping("/accounts/daybook")
 	public String daybook(Model model) {
 		model.addAttribute("today", LocalDate.now());
 		return "modules/account/daybook";
 	}
-	
+
 	@GetMapping("/accounts/ledgerbook")
 	public String ledgerbook(Model model) {
 		model.addAttribute("today", LocalDate.now());
 		return "modules/account/ledgerbook";
 	}
-	
+
 	// devotee
 	@GetMapping("/vendor/{vtype}")
 	public String vendorPage(@PathVariable String vtype, Model model) {
@@ -185,21 +183,21 @@ public class WebController {
 		model.addAttribute("vtype", vtype);
 		return "modules/others/vendor";
 	}
-	
+
 	// inventory
 	@GetMapping("/inventory/item")
 	public String itemMaster(Model model) {
 		model.addAttribute("utype", ItemUnitType.values());
 		return "modules/inventory/item";
 	}
-	
+
 	@GetMapping("/inventory/stock")
 	public String currentStock(Model model) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 		model.addAttribute("dateTime", LocalDateTime.now().format(formatter));
 		return "modules/inventory/current_stock";
 	}
-	
+
 	@GetMapping("/inventory/stock-transaction")
 	public String stockTransaction(Model model) {
 		model.addAttribute("date", LocalDate.now());
@@ -209,19 +207,5 @@ public class WebController {
 		model.addAttribute("utype", ItemUnitType.values());
 		return "modules/inventory/stock_transaction";
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 }
