@@ -23,9 +23,9 @@
 					Cancel
 				</button>
 				<label class="inline-flex items-center gap-2 cursor-pointer">
-				    <input type="checkbox" id="confirmPrint" checked
-				           class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-				    <span class="text-sm">Malayalam</span>
+					<input type="checkbox" id="confirmPrint" checked
+						class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+					<span class="text-sm">Malayalam</span>
 				</label>
 				<button onclick="printIframe()" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">
 					Print
@@ -55,6 +55,17 @@
 				<button id="serchPooja"
 					class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
 					Search
+				</button>
+			</div>
+
+			<!-- Right Side: Export & Print -->
+			<div class="flex items-center gap-3">
+				<!-- <button onclick="window.print()" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">
+					Print
+				</button> -->
+				<button id="excelExportPooja"
+					class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
+					Export Excel
 				</button>
 			</div>
 		</div>
