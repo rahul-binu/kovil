@@ -49,19 +49,41 @@ function mergeData(data) {
 	let poojaList = mapToFields(data.pj.label, data.pj.data);
 	let transList = mapToFields(data.pt.label, data.pt.data);
 
+	let poojaGrouped = {};
+	poojaList.forEach(pj => {
+		let tid = pj["pjtransId"];
+		if (!poojaGrouped[tid]) poojaGrouped[tid] = [];
+		poojaGrouped[tid].push(pj);
+	});
+
+	let transGrouped = {};
+	transList.forEach(pt => {
+		let tid = pt["pttransId"];
+		if (!transGrouped[tid]) transGrouped[tid] = [];
+		transGrouped[tid].push(pt);
+	});
+
 	let finalMerged = [];
 
-	transList.forEach(pt => {
-		const tid = pt["pttransId"];
+	Object.keys(poojaGrouped).forEach(tid => {
+		let pjs = poojaGrouped[tid] || [];
+		let pts = transGrouped[tid] || [];
 
-		let pj = poojaList.find(x => x["pjtransId"] === tid) || {};
-		let cs = vendorMap[pj["pjdevotee"]] || {};
+		let maxLen = Math.max(pjs.length, pts.length);
 
-		finalMerged.push({
-			...pt,
-			...pj,
-			...cs
-		});
+		for (let i = 0; i < maxLen; i++) {
+			// Zip the records. If one array is shorter, fall back to its first element
+			let pj = pjs[i] || pjs[0] || {};
+			let pt = pts[i] || pts[0] || {};
+
+			let cs = vendorMap[pj["pjdevotee"]] || {};
+
+			finalMerged.push({
+				...pt,
+				...pj,
+				...cs
+			});
+		}
 	});
 
 	poojaTransData = finalMerged;
