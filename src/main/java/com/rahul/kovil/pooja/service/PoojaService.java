@@ -41,7 +41,7 @@ public class PoojaService {
 
 	private final PoojaRepository poojaRepository;
 	private final PoojaTransactionRepository poojaTransactionRepository;
-	
+
 	@Autowired
 	private TransactionRepository transactionRepository;
 
@@ -54,10 +54,10 @@ public class PoojaService {
 	}
 
 	@Transactional
-	public OfferingDto saveOffering(OfferingDto offering, String tenantId, String userId) {
+	public OfferingDto saveOffering(OfferingDto offering, String tenantId, String userId, String transId) {
 
 		// Use injected SiteHelper, not static call
-		String transId = SiteHelper.transId("pja");
+		// String transId = SiteHelper.transId("pja");
 
 		String vendorId = offering.getVendorId();
 		Long vendorAccountId = offering.getVendorAccountId();
@@ -75,7 +75,9 @@ public class PoojaService {
 			vendorAccountId = vendor.getAccountId();
 		}
 
-		Pooja pooja = new Pooja(null, vendorId, userId, transId, offering.getBooking(), offering.getBookingDate(), null, offering.getAdvanceAmount(), BookingStatus.valueOf(offering.getBookingStatus()), offering.getPooja().getDate(), offering.getPooja().getAmount(), offering.getPooja().getStatus());
+		Pooja pooja = new Pooja(null, vendorId, userId, transId, offering.getBooking(), offering.getBookingDate(), null,
+				offering.getAdvanceAmount(), BookingStatus.valueOf(offering.getBookingStatus()),
+				offering.getPooja().getDate(), offering.getPooja().getAmount(), offering.getPooja().getStatus());
 		pooja.setTenantId(tenantId);
 
 		// Create transaction list
@@ -91,19 +93,20 @@ public class PoojaService {
 		for (Map<String, Object> row : results) {
 			String prefix = (String) row.get("prefix");
 			Number maxNum = (Number) row.get("maxNo"); // cast safely
-			Long max = maxNum == null ? 0L : maxNum.longValue();
+			Long max = maxNum == null ? 1L : maxNum.longValue() + 1;
 			prefixMaxMap.put(prefix, max);
 		}
 
 		for (String prefix : prefixes) {
-			prefixMaxMap.putIfAbsent(prefix, 0L);
+			prefixMaxMap.putIfAbsent(prefix, 1l);
 		}
 
 		for (PoojaTransactonDto p : offering.getPoojaTrans()) {
-			Long nextReceipt = prefixMaxMap.get(p.getPrefix()) + 1;
+			Long nextReceipt = prefixMaxMap.getOrDefault(p.getPrefix(), 1l);
 			prefixMaxMap.put(p.getPrefix(), nextReceipt);
 
-			PoojaTransaction tx = new PoojaTransaction(null, transId, vendorId, p.getPoojaMaster(), p.getPrefix(), nextReceipt, p.getAmount(), com.rahul.kovil.common.enums.BaseStatus.ACTIVE);
+			PoojaTransaction tx = new PoojaTransaction(null, transId, vendorId, p.getPoojaMaster(), p.getPrefix(),
+					nextReceipt, p.getAmount(), com.rahul.kovil.common.enums.BaseStatus.ACTIVE);
 			tx.setTenantId(tenantId);
 			poojaTrans.add(tx);
 		}
@@ -116,22 +119,28 @@ public class PoojaService {
 		Long payMode = offering.getPaymode();
 		Long poojaIncomeLedger = 11l;
 		Long poojaAdvanceLedger = 12l;
-		
-		Long toLedger = offering.getBooking()? poojaAdvanceLedger : poojaIncomeLedger;
-		BigDecimal amount = offering.getBooking()? offering.getAdvanceAmount() : offering.getPooja().getAmount();
+
+		Long toLedger = offering.getBooking() ? poojaAdvanceLedger : poojaIncomeLedger;
+		BigDecimal amount = offering.getBooking() ? offering.getAdvanceAmount() : offering.getPooja().getAmount();
 		toLedger = poojaIncomeLedger;
-//
-//		TransactionDto transaction = accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null,  vendorAccountId, payMode, 
-//				amount, transactionDate, offering.getAccRemark(), TransactionType.RECEIPT,
-//				TransactionStatus.ACTIVE, transId, offering.getReferenceDate(), offering.getReferneceNo()), tenantId, userId);
-//		
-//		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", transaction.getVoucherNo(), toLedger, vendorAccountId,
-//				amount, transactionDate, offering.getAccRemark(), TransactionType.RECEIPT,
-//				TransactionStatus.ACTIVE, transId, offering.getReferenceDate(), offering.getReferneceNo()), tenantId, userId);
-		
-		TransactionDto transaction = accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null,  toLedger, payMode, 
-				amount, transactionDate, offering.getAccRemark(), TransactionType.RECEIPT,
-				TransactionStatus.ACTIVE, transId, offering.getReferenceDate(), offering.getReferneceNo()), tenantId, userId);
+		//
+		// TransactionDto transaction = accountService.saveTransaction(new
+		// TransactionDto(null, userId, "POOJA", null, vendorAccountId, payMode,
+		// amount, transactionDate, offering.getAccRemark(), TransactionType.RECEIPT,
+		// TransactionStatus.ACTIVE, transId, offering.getReferenceDate(),
+		// offering.getReferneceNo()), tenantId, userId);
+		//
+		// accountService.saveTransaction(new TransactionDto(null, userId, "POOJA",
+		// transaction.getVoucherNo(), toLedger, vendorAccountId,
+		// amount, transactionDate, offering.getAccRemark(), TransactionType.RECEIPT,
+		// TransactionStatus.ACTIVE, transId, offering.getReferenceDate(),
+		// offering.getReferneceNo()), tenantId, userId);
+
+		TransactionDto transaction = accountService.saveTransaction(
+				new TransactionDto(null, userId, "POOJA", null, toLedger, payMode,
+						amount, transactionDate, offering.getAccRemark(), TransactionType.RECEIPT,
+						TransactionStatus.ACTIVE, transId, offering.getReferenceDate(), offering.getReferneceNo()),
+				tenantId, userId);
 
 		OfferingDto response = new OfferingDto();
 		response.setTransId(transId);
@@ -143,34 +152,46 @@ public class PoojaService {
 		return response;
 	}
 
-	
 	@Transactional
-	public void closePoojaAdvance(String tenantId, String userId, PoojaAdvanceCloseRequestDto dto) throws RuntimeException{
+	public void closePoojaAdvance(String tenantId, String userId, PoojaAdvanceCloseRequestDto dto)
+			throws RuntimeException {
 		Pooja pooja = poojaRepository.findByTransId(dto.getTransId());
-		
+
 		pooja.setBookingStatus(BookingStatus.CLOSED);
 		pooja.setBookingCloseDate(dto.getCloseDate());
-		
+
 		String transId = SiteHelper.transId("adv");
-//		Long vendorAccountId = dto.getVendorAccId();
-//		Long poojaAdvanceLedger = 12l;
+		// Long vendorAccountId = dto.getVendorAccId();
+		// Long poojaAdvanceLedger = 12l;
 		Long poojaIncomeLedger = 11l;
-//		LocalDateTime c = dto.getCloseDate().now();
-//		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, dto.getPayMode(), vendorAccountId,
-//				dto.getPayingAmount(), dto.getCloseDate().atTime(LocalTime.now()), dto.getRemark(), TransactionType.RECEIPT,
-//				TransactionStatus.ACTIVE, transId, dto.getReferenceDate(), dto.getReferenceNumber()), tenantId, userId);
-//
-//		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, vendorAccountId, poojaIncomeLedger,
-//				dto.getPayingAmount(), dto.getCloseDate().atTime(LocalTime.now()), dto.getRemark(), TransactionType.RECEIPT,
-//				TransactionStatus.ACTIVE, transId, dto.getReferenceDate(), dto.getReferenceNumber()), tenantId, userId);
-//		
-//		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, poojaAdvanceLedger, poojaIncomeLedger,
-//				dto.getOldAdvance(), dto.getCloseDate().atTime(LocalTime.now()), dto.getRemark(), TransactionType.RECEIPT,
-//				TransactionStatus.ACTIVE, transId, dto.getReferenceDate(), dto.getReferenceNumber()), tenantId, userId);	
-		
-		accountService.saveTransaction(new TransactionDto(null, userId, "POOJA", null, poojaIncomeLedger, dto.getPayMode(),
-		dto.getPayingAmount(), dto.getCloseDate().atTime(LocalTime.now()), dto.getRemark(), TransactionType.RECEIPT,
-		TransactionStatus.ACTIVE, transId, dto.getReferenceDate(), dto.getReferenceNumber()), tenantId, userId);		
+		// LocalDateTime c = dto.getCloseDate().now();
+		// accountService.saveTransaction(new TransactionDto(null, userId, "POOJA",
+		// null, dto.getPayMode(), vendorAccountId,
+		// dto.getPayingAmount(), dto.getCloseDate().atTime(LocalTime.now()),
+		// dto.getRemark(), TransactionType.RECEIPT,
+		// TransactionStatus.ACTIVE, transId, dto.getReferenceDate(),
+		// dto.getReferenceNumber()), tenantId, userId);
+		//
+		// accountService.saveTransaction(new TransactionDto(null, userId, "POOJA",
+		// null, vendorAccountId, poojaIncomeLedger,
+		// dto.getPayingAmount(), dto.getCloseDate().atTime(LocalTime.now()),
+		// dto.getRemark(), TransactionType.RECEIPT,
+		// TransactionStatus.ACTIVE, transId, dto.getReferenceDate(),
+		// dto.getReferenceNumber()), tenantId, userId);
+		//
+		// accountService.saveTransaction(new TransactionDto(null, userId, "POOJA",
+		// null, poojaAdvanceLedger, poojaIncomeLedger,
+		// dto.getOldAdvance(), dto.getCloseDate().atTime(LocalTime.now()),
+		// dto.getRemark(), TransactionType.RECEIPT,
+		// TransactionStatus.ACTIVE, transId, dto.getReferenceDate(),
+		// dto.getReferenceNumber()), tenantId, userId);
+
+		accountService.saveTransaction(
+				new TransactionDto(null, userId, "POOJA", null, poojaIncomeLedger, dto.getPayMode(),
+						dto.getPayingAmount(), dto.getCloseDate().atTime(LocalTime.now()), dto.getRemark(),
+						TransactionType.RECEIPT,
+						TransactionStatus.ACTIVE, transId, dto.getReferenceDate(), dto.getReferenceNumber()),
+				tenantId, userId);
 	}
 
 	@Transactional
@@ -179,6 +200,5 @@ public class PoojaService {
 		transactionRepository.softDelete(tid, TransactionStatus.CANCELED);
 		poojaTransactionRepository.softDelete(tid, BaseStatus.CANCELED);
 	}
-
 
 }

@@ -19,6 +19,7 @@ import com.rahul.kovil.common.dto.PoojaAdvanceCloseRequestDto;
 import com.rahul.kovil.common.dto.PoojaMasterDto;
 import com.rahul.kovil.common.enums.BaseStatus;
 import com.rahul.kovil.common.response.ApiResponse;
+import com.rahul.kovil.common.util.SiteHelper;
 import com.rahul.kovil.config.JwtProvider;
 import com.rahul.kovil.pooja.service.PoojaMasterService;
 import com.rahul.kovil.pooja.service.PoojaService;
@@ -81,23 +82,26 @@ public class PoojaController {
 			@RequestBody OfferingDto offering) {
 		String tenantId = jwt.getTenantId(token);
 		String userId = jwt.getUserId(token);
-		return ResponseEntity.ok(poojaService.saveOffering(offering, tenantId, userId));
+		String transId = SiteHelper.transId("pja");
+		return ResponseEntity.ok(poojaService.saveOffering(offering, tenantId, userId, transId));
 	}
 
-    @PostMapping("/offering/bulk")
-    public ResponseEntity<List<OfferingDto>> saveBulkOffering(@RequestHeader("Authorization") String token,
-            @RequestBody List<OfferingDto> offerings) {
-        String tenantId = jwt.getTenantId(token);
-        String userId = jwt.getUserId(token);
-        
-        List<OfferingDto> savedOfferings = new java.util.ArrayList<>();
-        for (OfferingDto offering : offerings) {
-            OfferingDto saved = poojaService.saveOffering(offering, tenantId, userId);
-            savedOfferings.add(saved);
-        }
-        
-        return ResponseEntity.ok(savedOfferings);
-    }
+	@PostMapping("/offering/bulk")
+	public ResponseEntity<List<OfferingDto>> saveBulkOffering(@RequestHeader("Authorization") String token,
+			@RequestBody List<OfferingDto> offerings) {
+		String tenantId = jwt.getTenantId(token);
+		String userId = jwt.getUserId(token);
+
+		List<OfferingDto> savedOfferings = new java.util.ArrayList<>();
+
+		String transId = SiteHelper.transId("pja");
+		for (OfferingDto offering : offerings) {
+			OfferingDto saved = poojaService.saveOffering(offering, tenantId, userId, transId);
+			savedOfferings.add(saved);
+		}
+
+		return ResponseEntity.ok(savedOfferings);
+	}
 
 	@PostMapping("/advance-close")
 	public ResponseEntity<ApiResponse> makePayment(@RequestHeader("Authorization") String token,
@@ -113,7 +117,7 @@ public class PoojaController {
 					.message("Failed to close pooja advance").status(HttpStatus.INTERNAL_SERVER_ERROR).build());
 		}
 	}
-	
+
 	@DeleteMapping("/offering/{tid}")
 	public ResponseEntity<ApiResponse> deletePooja(@PathVariable String tid) {
 		String tenantId = "";

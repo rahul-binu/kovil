@@ -15,8 +15,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,7 +28,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "poojas")
 public class Pooja extends BaseEntity {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,16 +47,16 @@ public class Pooja extends BaseEntity {
     private Boolean booking = false;
 
     private LocalDate bookingDate = null;
-    
+
     private LocalDate bookingCloseDate = null;
-    
+
     private BigDecimal advanceAmount;
 
     @Enumerated(EnumType.STRING)
     private BookingStatus bookingStatus = BookingStatus.NONE;
-    
+
     private LocalDateTime date;
-    
+
     @Column(precision = 10, scale = 2)
     private BigDecimal amount;
 
