@@ -62,4 +62,12 @@ public class Pooja extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private BaseStatus status = BaseStatus.ACTIVE;
+
+    @Override
+    public String toString() {
+        return "Pooja [id=" + id + ", devotee=" + devotee + ", user=" + user + ", transId=" + transId
+                + ", booking=" + booking + ", bookingDate=" + bookingDate + ", bookingCloseDate=" + bookingCloseDate
+                + ", advanceAmount=" + advanceAmount + ", bookingStatus=" + bookingStatus + ", date=" + date
+                + ", amount=" + amount + ", status=" + status + "]";
+    }
 }

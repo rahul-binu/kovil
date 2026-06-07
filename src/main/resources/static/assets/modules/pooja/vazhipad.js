@@ -324,7 +324,7 @@ function saveBulkPooja() {
 		.then(r => r.json())
 		.then(res => {
 			console.log("Saved:", res);
-			openPrintModal(res.transIds);
+			openPrintModal(res[0].transId);
 			// success toast or redirect
 		})
 		.catch(err => console.error("Error:", err));

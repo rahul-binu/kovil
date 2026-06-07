@@ -1,5 +1,6 @@
 package com.rahul.kovil.pooja.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,14 +20,14 @@ public class PPrintService {
 	private final PoojaRepository poojaRepository;
 	private final PoojaTransactionRepository poojaTransactionRepository;
 	private final VendorRepository vendorRepository;
-	
-	
-	public PPrintService(PoojaRepository poojaRepository, PoojaTransactionRepository poojaTransactionRepository, VendorRepository vendorRepository) {
+
+	public PPrintService(PoojaRepository poojaRepository, PoojaTransactionRepository poojaTransactionRepository,
+			VendorRepository vendorRepository) {
 		this.poojaRepository = poojaRepository;
 		this.poojaTransactionRepository = poojaTransactionRepository;
 		this.vendorRepository = vendorRepository;
 	}
-	
+
 	public Map<String, Object> poojaRreceiptPrint(String tid) {
 		Map<String, Object> res = new HashMap<>();
 		Pooja pooja = poojaRepository.findByTransId(tid);
@@ -41,20 +42,21 @@ public class PPrintService {
 		return res;
 	}
 
-    public Map<String, Object> poojaRreceiptDotPrint(String tid) {
-        Map<String, Object> res = new HashMap<>();
-        Pooja pooja = poojaRepository.findByTransId(tid);
-        if (pooja == null) {
-            return res; // return empty result if pooja not found
-        }
-        List<PoojaTransaction> poojat = poojaTransactionRepository.findByTransId(tid);
-        Vendor vendor = vendorRepository.findByTransId(pooja.getDevotee());
-        res.put("pooja", pooja);
-        res.put("poojat", poojat);
-        res.put("vendor", vendor);
-        return res;
-    }
+	public Map<String, Object> poojaRreceiptDotPrint(String tid) {
+		Map<String, Object> res = new HashMap<>();
+		List<Pooja> poojas = poojaRepository.findAllByTransId(tid);
 
+		List<Vendor> vendors = new ArrayList<>();
+		for (Pooja p : poojas) {
+			Vendor vendor = vendorRepository.findByTransId(p.getDevotee());
+			vendors.add(vendor);
+		}
+		List<PoojaTransaction> poojat = poojaTransactionRepository.findByTransId(tid);
 
+		res.put("vendors", vendors);
+		res.put("poojas", poojas);
+		res.put("poojat", poojat);
+		return res;
+	}
 
 }

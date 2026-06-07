@@ -26,4 +26,9 @@ public interface PoojaRepository extends JpaRepository<Pooja, Long> {
 			""")
 	List<Pooja> findPoojaBookingByDate(LocalDate date, BaseStatus status, String tenantId, BookingStatus bstatus);
 
+	@Query("""
+			SELECT p FROM Pooja p WHERE p.transId = :transId
+			""")
+	List<Pooja> findAllByTransId(String transId);
+
 }

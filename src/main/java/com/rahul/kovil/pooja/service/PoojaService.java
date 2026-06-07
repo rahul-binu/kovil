@@ -54,7 +54,8 @@ public class PoojaService {
 	}
 
 	@Transactional
-	public OfferingDto saveOffering(OfferingDto offering, String tenantId, String userId, String transId) {
+	public OfferingDto saveOffering(OfferingDto offering, String tenantId, String userId, String transId,
+			Long nextReceipt) {
 
 		// Use injected SiteHelper, not static call
 		// String transId = SiteHelper.transId("pja");
@@ -83,28 +84,7 @@ public class PoojaService {
 		// Create transaction list
 		List<PoojaTransaction> poojaTrans = new ArrayList<>();
 
-		Set<String> prefixes = offering.getPoojaTrans().stream().map(PoojaTransactonDto::getPrefix)
-				.collect(Collectors.toSet());
-
-		List<Map<String, Object>> results = poojaTransactionRepository
-				.findMaxReceiptNoByTenantIdAndPrefixInAndStatus(tenantId, prefixes, BaseStatus.ACTIVE);
-
-		Map<String, Long> prefixMaxMap = new HashMap<>();
-		for (Map<String, Object> row : results) {
-			String prefix = (String) row.get("prefix");
-			Number maxNum = (Number) row.get("maxNo"); // cast safely
-			Long max = maxNum == null ? 1L : maxNum.longValue() + 1;
-			prefixMaxMap.put(prefix, max);
-		}
-
-		for (String prefix : prefixes) {
-			prefixMaxMap.putIfAbsent(prefix, 1l);
-		}
-
 		for (PoojaTransactonDto p : offering.getPoojaTrans()) {
-			Long nextReceipt = prefixMaxMap.getOrDefault(p.getPrefix(), 1l);
-			prefixMaxMap.put(p.getPrefix(), nextReceipt);
-
 			PoojaTransaction tx = new PoojaTransaction(null, transId, vendorId, p.getPoojaMaster(), p.getPrefix(),
 					nextReceipt, p.getAmount(), com.rahul.kovil.common.enums.BaseStatus.ACTIVE);
 			tx.setTenantId(tenantId);

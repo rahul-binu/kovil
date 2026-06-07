@@ -1,6 +1,10 @@
 package com.rahul.kovil.pooja.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.rahul.kovil.common.dto.OfferingDto;
 import com.rahul.kovil.common.dto.PoojaAdvanceCloseRequestDto;
 import com.rahul.kovil.common.dto.PoojaMasterDto;
+import com.rahul.kovil.common.dto.PoojaTransactonDto;
 import com.rahul.kovil.common.enums.BaseStatus;
 import com.rahul.kovil.common.response.ApiResponse;
 import com.rahul.kovil.common.util.SiteHelper;
 import com.rahul.kovil.config.JwtProvider;
+import com.rahul.kovil.pooja.repository.PoojaTransactionRepository;
 import com.rahul.kovil.pooja.service.PoojaMasterService;
 import com.rahul.kovil.pooja.service.PoojaService;
 
@@ -34,11 +40,14 @@ public class PoojaController {
 
 	private final PoojaMasterService poojaMasterService;
 	private final PoojaService poojaService;
+	private final PoojaTransactionRepository poojaTransactionRepository;
 
-	public PoojaController(JwtProvider jwt, PoojaMasterService poojaMaster, PoojaService poojaService) {
+	public PoojaController(JwtProvider jwt, PoojaMasterService poojaMaster, PoojaService poojaService,
+			PoojaTransactionRepository poojaTransactionRepository) {
 		this.jwt = jwt;
 		this.poojaMasterService = poojaMaster;
 		this.poojaService = poojaService;
+		this.poojaTransactionRepository = poojaTransactionRepository;
 	}
 
 	@PostMapping("/master")
@@ -83,7 +92,8 @@ public class PoojaController {
 		String tenantId = jwt.getTenantId(token);
 		String userId = jwt.getUserId(token);
 		String transId = SiteHelper.transId("pja");
-		return ResponseEntity.ok(poojaService.saveOffering(offering, tenantId, userId, transId));
+		Long receiptNo = 0l;
+		return ResponseEntity.ok(poojaService.saveOffering(offering, tenantId, userId, transId, receiptNo));
 	}
 
 	@PostMapping("/offering/bulk")
@@ -95,8 +105,20 @@ public class PoojaController {
 		List<OfferingDto> savedOfferings = new java.util.ArrayList<>();
 
 		String transId = SiteHelper.transId("pja");
+
+		  String prefix = offerings.get(0)
+            .getPoojaTrans()
+            .get(0)
+            .getPrefix();
+
+    Long nextReceipt = poojaTransactionRepository
+            .findMaxReceiptNoByTenantIdAndPrefixAndStatus(tenantId, prefix, BaseStatus.ACTIVE)
+            .map(max -> max + 1)
+            .orElse(1L);
+
+
 		for (OfferingDto offering : offerings) {
-			OfferingDto saved = poojaService.saveOffering(offering, tenantId, userId, transId);
+			OfferingDto saved = poojaService.saveOffering(offering, tenantId, userId, transId, nextReceipt);
 			savedOfferings.add(saved);
 		}
 

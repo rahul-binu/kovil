@@ -1,8 +1,11 @@
 package com.rahul.kovil.pooja.controller;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -22,6 +25,7 @@ import javax.print.PrintServiceLookup;
 import javax.print.PrintService;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import com.rahul.kovil.pooja.entity.Pooja;
@@ -32,15 +36,16 @@ import com.rahul.kovil.vendor.entity.Vendor;
 @RestController
 @RequestMapping("/api/print")
 public class PrintController {
-	
+
 	private final PPrintService printService;
 	private final DotMatrixPrintService dotMatrixPrintService;
 	private final DotMatrixPrinterConfig printerConfig;
-	
+
 	@Value("${client.name:SRI KOVIL TEMPLE}")
 	private String clientName;
-	
-	public PrintController(PPrintService printService, DotMatrixPrintService dotMatrixPrintService, DotMatrixPrinterConfig printerConfig) {
+
+	public PrintController(PPrintService printService, DotMatrixPrintService dotMatrixPrintService,
+			DotMatrixPrinterConfig printerConfig) {
 		this.printService = printService;
 		this.dotMatrixPrintService = dotMatrixPrintService;
 		this.printerConfig = printerConfig;
@@ -109,13 +114,16 @@ public class PrintController {
 		if (printer == null || printer.isEmpty()) {
 			return ResponseEntity.badRequest().body("Provide printer query param, e.g. ?printer=EPSON LX-310");
 		}
-		return ResponseEntity.ok(java.util.Map.of("printer", printer, "flavors", dotMatrixPrintService.getSupportedDocFlavors(printer)));
+		return ResponseEntity.ok(
+				java.util.Map.of("printer", printer, "flavors", dotMatrixPrintService.getSupportedDocFlavors(printer)));
 	}
 
 	@GetMapping("/pooja/{tids}")
-	public ResponseEntity<?> poojaRreceiptPrint(@PathVariable String tids, @RequestParam(value = "printer", required = false) String printer){
+	public ResponseEntity<?> poojaRreceiptPrint(@PathVariable String tids,
+			@RequestParam(value = "printer", required = false) String printer) {
 		// If a printer is provided by the UI or a default printer is configured,
-		// forward the request to the dot-matrix printing flow so the UI can trigger printing.
+		// forward the request to the dot-matrix printing flow so the UI can trigger
+		// printing.
 		String targetPrinter = (printer != null && !printer.isEmpty()) ? printer : printerConfig.getPrinterName();
 		if (targetPrinter != null && !targetPrinter.isEmpty()) {
 			return dotMatrixPrint(tids, targetPrinter);
@@ -131,83 +139,130 @@ public class PrintController {
 		}
 		return ResponseEntity.ok(printService.poojaRreceiptPrint(tids));
 	}
-	
-	    @SuppressWarnings("unchecked")
-    @GetMapping("/dotmatrix/pooja/{tids}")
-    public ResponseEntity<?> dotMatrixPrint(@PathVariable String tids, @RequestParam(value = "printer", required = false) String printer) {
-        // Split incoming ids (comma separated)
-        String[] splitTids = tids != null ? tids.split(",") : new String[0];
-        if (splitTids.length == 0 && tids != null && !tids.isEmpty()) {
-            splitTids = new String[] { tids };
-        }
-        String targetPrinter = (printer != null && !printer.isEmpty()) ? printer : printerConfig.getPrinterName();
 
-        // Aggregate data for the same pooja
-        Pooja aggregatedPooja = null;
-        Vendor aggregatedVendor = null;
-        List<PoojaTransaction> aggregatedTransactions = new java.util.ArrayList<>();
+	@SuppressWarnings("unchecked")
+	@GetMapping("/dotmatrix/pooja/{tids}")
+	public ResponseEntity<?> dotMatrixPrint(@PathVariable String tids,
+			@RequestParam(value = "printer", required = false) String printer) {
 
-        for (String tid : splitTids) {
-            Map<String, Object> data = printService.poojaRreceiptPrint(tid.trim());
-            Pooja pooja = (Pooja) data.get("pooja");
-            List<PoojaTransaction> poojat = (List<PoojaTransaction>) data.get("poojat");
-            Vendor vendor = (Vendor) data.get("vendor");
-            if (pooja != null) {
-                if (aggregatedPooja == null) {
-                    aggregatedPooja = pooja;
-                    aggregatedVendor = vendor;
-                }
-                if (poojat != null) {
-                    aggregatedTransactions.addAll(poojat);
-                }
-            }
-        }
+		// Split incoming ids (comma separated)
+		String[] splitTids = (tids != null && !tids.isEmpty()) ? tids.split(",") : new String[0];
 
-        if (aggregatedPooja == null) {
-            return ResponseEntity.badRequest().body(java.util.Map.of("error", "No valid pooja data found for provided ids"));
-        }
+		// Aggregate data across all transaction ids
+		List<Pooja> aggregatedPooja = null;
+		List<Vendor> aggregatedVendor = null;
+		List<PoojaTransaction> aggregatedTransactions = new ArrayList<>();
 
-        int receiptWidth = 40;
-        DotMatrixReceiptBuilder builder = new DotMatrixReceiptBuilder(printerConfig);
-        builder.addRow(DotMatrixTextUtil.padLeft(clientName, receiptWidth / 2 + (clientName.length() / 2)));
-        builder.addRow(DotMatrixTextUtil.padLeft("Official Receipt", receiptWidth / 2 + 8));
-        builder.addDivider('-', receiptWidth);
+		for (String tid : splitTids) {
+			Map<String, Object> data = printService.poojaRreceiptDotPrint(tid.trim());
+			List<Pooja> pooja = (List<Pooja>) data.get("poojas");
+			List<PoojaTransaction> poojat = (List<PoojaTransaction>) data.get("poojat");
+			List<Vendor> vendors = (List<Vendor>) data.get("vendors");
 
-        String dateStr = aggregatedPooja.getDate() != null ? aggregatedPooja.getDate().format(DateTimeFormatter.ofPattern("dd-MMM-yyyy")) : "";
-        builder.addLeftRightRow("Date:", dateStr, receiptWidth);
+			if (pooja != null && !pooja.isEmpty()) {
+				if (aggregatedPooja == null) {
+					aggregatedPooja = pooja;
+					aggregatedVendor = vendors;
+				}
+				if (poojat != null) {
+					aggregatedTransactions.addAll(poojat);
+				}
+			}
+		}
 
-        String vendorName = aggregatedVendor != null ? aggregatedVendor.getFullName() : "";
-        String nakshathra = aggregatedVendor != null && aggregatedVendor.getNakshathra() != null ? aggregatedVendor.getNakshathra().name() : "";
-        if (!nakshathra.isEmpty()) {
-            vendorName += " (" + nakshathra + ")";
-        }
-        builder.addLeftRightRow("Name:", vendorName, receiptWidth);
-        builder.addDivider('-', receiptWidth);
+		// Guard: nothing fetched
+		if (aggregatedPooja == null || aggregatedPooja.isEmpty()) {
+			return ResponseEntity.badRequest()
+					.body(ApiResponse.builder()
+							.message("No valid pooja data found for provided ids")
+							.status(HttpStatus.BAD_REQUEST)
+							.build());
+		}
+		if (aggregatedVendor == null) {
+			aggregatedVendor = new ArrayList<>();
+		}
+		// ----------------------------------------------------------------
+		// Build receipt
+		// ----------------------------------------------------------------
+		DotMatrixReceiptBuilder builder = new DotMatrixReceiptBuilder(printerConfig);
 
-        for (PoojaTransaction pt : aggregatedTransactions) {
-            String pName = pt.getPoojaMaster() != null ? pt.getPoojaMaster().getName() : "";
-            if (pName.length() > receiptWidth) {
-                builder.addRow(pName.substring(0, receiptWidth));
-            } else {
-                builder.addRow(pName);
-            }
-            String amountStr = pt.getAmount() != null ? pt.getAmount().toString() : "0.00";
-            String rcptNo = pt.getReceiptNo() != null ? pt.getPrefix() + pt.getReceiptNo() : "";
-            builder.addLeftRightRow("  Rcpt: " + rcptNo, amountStr, receiptWidth);
-        }
+		// --- Receipt No (top area, right side of pre-printed form) ---
+		String receiptNo = "";
 
-        builder.addDivider('-', receiptWidth);
-        builder.addLeftRightRow("TOTAL:", aggregatedPooja.getAmount() != null ? aggregatedPooja.getAmount().toString() : "0.00", receiptWidth);
-        builder.addDivider('=', receiptWidth);
-        builder.addRow(DotMatrixTextUtil.padLeft("Thank You!", receiptWidth / 2 + 5));
-        builder.addBlankLines(4);
-		System.out.println(builder.build());
-		
-        //boolean printOk = dotMatrixPrintService.printWithPrinterJob(targetPrinter, builder.build());
-        // if (!printOk) {
-        //     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        //             .body(ApiResponse.builder().message("Failed to send receipt to printer: " + targetPrinter).status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-        // }
-        return ResponseEntity.ok(ApiResponse.builder().message("Sent to dot matrix printer successfully").status(HttpStatus.OK).build());
-    }
+		if (!aggregatedTransactions.isEmpty()) {
+			var tx = aggregatedTransactions.get(0);
+
+			String prefix = tx.getPrefix();
+			Long receipt = tx.getReceiptNo();
+
+			receiptNo = (prefix != null ? prefix : "")
+					.replace("@N@", receipt != null ? receipt + "" : "");
+		}
+
+		builder.addFieldAt(receiptNo, 2, 28);
+
+		String dateStr = aggregatedPooja.get(0).getDate() != null
+				? aggregatedPooja.get(0).getDate().format(DateTimeFormatter.ofPattern("dd-MMM-yyyy"))
+				: "";
+		builder.addFieldAt(dateStr, 3, 28);
+
+		String poojaName = "";
+		if (!aggregatedTransactions.isEmpty() && aggregatedTransactions.get(0).getPoojaMaster() != null) {
+			poojaName = aggregatedTransactions.get(0).getPoojaMaster().getName() != null
+					? aggregatedTransactions.get(0).getPoojaMaster().getName()
+					: "";
+		}
+
+		builder.addFieldAt("Ayyappan", 7, 12);
+		builder.addFieldAt(poojaName, 8, 12);
+
+		Map<String, BigDecimal> vendorAmtMap = new HashMap<>();
+		for (PoojaTransaction t : aggregatedTransactions) {
+			if (t.getVendorId() == null)
+				continue;
+			vendorAmtMap.merge(
+					t.getVendorId(),
+					t.getAmount() != null ? t.getAmount() : BigDecimal.ZERO,
+					BigDecimal::add);
+		}
+
+		List<String[]> vendorRows = new ArrayList<>();
+		for (Vendor v : aggregatedVendor) {
+			String name = v.getFullName() != null ? v.getFullName() : "";
+			String star = v.getNakshathra() != null ? v.getNakshathra().name() : "";
+			String amt = vendorAmtMap.getOrDefault(
+					v.getTransId(), // ← use the correct vendor ID field here
+					BigDecimal.ZERO).toString();
+			vendorRows.add(new String[] { name, star, amt });
+		}
+
+		builder.addVendorRows(2, 22, 38, 10, 2, vendorRows);
+
+		BigDecimal total = aggregatedTransactions.stream()
+				.map(PoojaTransaction::getAmount)
+				.filter(Objects::nonNull)
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+		builder.addFieldAt(total.toPlainString(), 22, 32);
+
+		String receipt = builder.build();
+		System.out.println(receipt);
+
+		String targetPrinter = (printer != null && !printer.isEmpty())
+				? printer
+				: printerConfig.getPrinterName();
+
+		boolean printOk = dotMatrixPrintService.printWithPrinterJob(targetPrinter, receipt);
+		if (!printOk) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(ApiResponse.builder()
+							.message("Failed to send receipt to printer: " + targetPrinter)
+							.status(HttpStatus.INTERNAL_SERVER_ERROR)
+							.build());
+		}
+
+		return ResponseEntity.ok(ApiResponse.builder()
+				.message("Sent to dot matrix printer successfully")
+				.status(HttpStatus.OK)
+				.build());
+	}
 }
