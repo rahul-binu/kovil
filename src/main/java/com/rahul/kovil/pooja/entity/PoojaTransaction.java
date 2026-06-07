@@ -35,6 +35,9 @@ public class PoojaTransaction extends BaseEntity {
 
     @Column(length = 60)
     private String transId;
+    
+    @Column(length = 60)
+    private String vendorId;
         
     @ManyToOne
     @JoinColumn(name = "pooja_master_id", nullable = false)

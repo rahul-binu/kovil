@@ -61,13 +61,13 @@ public class WebController {
 		return "modules/authentication/login";
 	}
 
-	@Autowired
-	DotMatrixSampleService dotMatrixSampleService;
+	// @Autowired
+	// DotMatrixSampleService dotMatrixSampleService;
 
 	@GetMapping("/auth/dashboard")
 	public String dashboard(Model m) {
 		m.addAttribute("today", LocalDate.now().plusDays(1));
-		dotMatrixSampleService.printSampleReceipt();
+		// dotMatrixSampleService.printSampleReceipt();
 
 		return "modules/others/dashboard";
 	}

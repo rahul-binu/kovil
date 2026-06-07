@@ -29,16 +29,32 @@ public class PPrintService {
 	
 	public Map<String, Object> poojaRreceiptPrint(String tid) {
 		Map<String, Object> res = new HashMap<>();
-		
 		Pooja pooja = poojaRepository.findByTransId(tid);
+		if (pooja == null) {
+			return res; // return empty result if pooja not found
+		}
 		List<PoojaTransaction> poojat = poojaTransactionRepository.findByTransId(tid);
-		Vendor vendor = vendorRepository.findByTransId(pooja.getDevotee());		
-		
+		Vendor vendor = vendorRepository.findByTransId(pooja.getDevotee());
 		res.put("pooja", pooja);
 		res.put("poojat", poojat);
 		res.put("vendor", vendor);
-		
 		return res;
 	}
+
+    public Map<String, Object> poojaRreceiptDotPrint(String tid) {
+        Map<String, Object> res = new HashMap<>();
+        Pooja pooja = poojaRepository.findByTransId(tid);
+        if (pooja == null) {
+            return res; // return empty result if pooja not found
+        }
+        List<PoojaTransaction> poojat = poojaTransactionRepository.findByTransId(tid);
+        Vendor vendor = vendorRepository.findByTransId(pooja.getDevotee());
+        res.put("pooja", pooja);
+        res.put("poojat", poojat);
+        res.put("vendor", vendor);
+        return res;
+    }
+
+
 
 }

@@ -103,8 +103,7 @@ public class PoojaService {
 			Long nextReceipt = prefixMaxMap.get(p.getPrefix()) + 1;
 			prefixMaxMap.put(p.getPrefix(), nextReceipt);
 
-			PoojaTransaction tx = new PoojaTransaction(null, transId, p.getPoojaMaster(), p.getPrefix(), nextReceipt,
-					p.getAmount(), p.getStatus());
+			PoojaTransaction tx = new PoojaTransaction(null, transId, vendorId, p.getPoojaMaster(), p.getPrefix(), nextReceipt, p.getAmount(), com.rahul.kovil.common.enums.BaseStatus.ACTIVE);
 			tx.setTenantId(tenantId);
 			poojaTrans.add(tx);
 		}
