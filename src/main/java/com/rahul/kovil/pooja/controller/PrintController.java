@@ -19,15 +19,19 @@ import com.rahul.kovil.common.response.ApiResponse;
 import com.rahul.kovil.dotmatrix.DotMatrixPrintService;
 import com.rahul.kovil.dotmatrix.DotMatrixPrinterConfig;
 import com.rahul.kovil.dotmatrix.DotMatrixReceiptBuilder;
-import com.rahul.kovil.dotmatrix.DotMatrixTextUtil;
 import com.rahul.kovil.dotmatrix.RawPrinterHelper;
 import javax.print.PrintServiceLookup;
 import javax.print.PrintService;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import com.rahul.kovil.pooja.entity.Pooja;
 import com.rahul.kovil.pooja.entity.PoojaTransaction;
 import com.rahul.kovil.pooja.service.PPrintService;
@@ -182,40 +186,56 @@ public class PrintController {
 			aggregatedVendor = new ArrayList<>();
 		}
 		// ----------------------------------------------------------------
-		// Build receipt
+		// Build receipt — positions from pre-printed paper (cm → row/col)
+		// Origin: TOP-LEFT. Y increases downward in feed direction.
+		// Conversion: row = round(Y_cm × 2.362) [6 LPI]
+		//             col = round(X_cm × 3.937)  [10 CPI]
+		// Paper: Length=15.5cm (feed direction), Width=10cm (horizontal)
 		// ----------------------------------------------------------------
 		DotMatrixReceiptBuilder builder = new DotMatrixReceiptBuilder(printerConfig);
 
-		// --- Receipt No (top area, right side of pre-printed form) ---
+		// --- Receipt No (NO): Y=3.8cm, X=11.0cm → row=9, col=43 ---
 		String receiptNo = "";
-
 		if (!aggregatedTransactions.isEmpty()) {
 			var tx = aggregatedTransactions.get(0);
-
 			String prefix = tx.getPrefix();
 			Long receipt = tx.getReceiptNo();
-
 			receiptNo = (prefix != null ? prefix : "")
 					.replace("@N@", receipt != null ? receipt + "" : "");
 		}
+		builder.addFieldAt(receiptNo, 9, 43); // NO: Y=3.8cm
 
-		builder.addFieldAt(receiptNo, 2, 28);
-
+		// --- Date: Y=4.4cm, X=11.0cm → row=10, col=43 ---
 		String dateStr = aggregatedPooja.get(0).getDate() != null
-				? aggregatedPooja.get(0).getDate().format(DateTimeFormatter.ofPattern("dd-MMM-yyyy"))
+				? aggregatedPooja.get(0).getDate().format(DateTimeFormatter.ofPattern("dd-MM-yy"))
 				: "";
-		builder.addFieldAt(dateStr, 3, 28);
+		builder.addFieldAt(dateStr, 10, 43); // Date: Y=4.4cm
 
+		// --- Pooja Name (Vazhipad): Y=4.4cm, X=4.5cm → row=10, col=18 ---
 		String poojaName = "";
 		if (!aggregatedTransactions.isEmpty() && aggregatedTransactions.get(0).getPoojaMaster() != null) {
 			poojaName = aggregatedTransactions.get(0).getPoojaMaster().getName() != null
 					? aggregatedTransactions.get(0).getPoojaMaster().getName()
 					: "";
 		}
+		builder.addFieldAt(poojaName, 10, 18); // Vazhipad: Y=4.4cm
 
-		builder.addFieldAt("Ayyappan", 7, 12);
-		builder.addFieldAt(poojaName, 8, 12);
+		// --- Devotee details (first devotee per receipt) ---
+		Vendor firstVendor = aggregatedVendor.isEmpty() ? null : aggregatedVendor.get(0);
 
+		// Name: Y=5.5cm, X=1.5cm → row=13, col=6
+		String devoteeName = firstVendor != null && firstVendor.getFullName() != null
+				? firstVendor.getFullName()
+				: "";
+		builder.addFieldAt(devoteeName, 13, 6); // Name: Y=5.5cm
+
+		// Star (Nakshatra): Y=5.5cm, X=8.0cm → row=13, col=31
+		String star = firstVendor != null && firstVendor.getNakshathra() != null
+				? firstVendor.getNakshathra().name()
+				: "";
+		builder.addFieldAt(star, 13, 31); // Star: Y=5.5cm
+
+		// Amount per devotee: Y=5.5cm, X=12.5cm → row=13, col=49
 		Map<String, BigDecimal> vendorAmtMap = new HashMap<>();
 		for (PoojaTransaction t : aggregatedTransactions) {
 			if (t.getVendorId() == null)
@@ -225,27 +245,29 @@ public class PrintController {
 					t.getAmount() != null ? t.getAmount() : BigDecimal.ZERO,
 					BigDecimal::add);
 		}
+		BigDecimal devoteeAmt = firstVendor != null
+				? vendorAmtMap.getOrDefault(firstVendor.getTransId(), BigDecimal.ZERO)
+				: BigDecimal.ZERO;
+		builder.addFieldAt(devoteeAmt.toPlainString(), 13, 49); // Amount: Y=5.5cm
 
-		List<String[]> vendorRows = new ArrayList<>();
-		for (Vendor v : aggregatedVendor) {
-			String name = v.getFullName() != null ? v.getFullName() : "";
-			String star = v.getNakshathra() != null ? v.getNakshathra().name() : "";
-			String amt = vendorAmtMap.getOrDefault(
-					v.getTransId(), // ← use the correct vendor ID field here
-					BigDecimal.ZERO).toString();
-			vendorRows.add(new String[] { name, star, amt });
-		}
-
-		builder.addVendorRows(2, 22, 38, 10, 2, vendorRows);
-
+		// --- Total Amount: Y=8.0cm, X=12.5cm → row=19, col=49 ---
 		BigDecimal total = aggregatedTransactions.stream()
 				.map(PoojaTransaction::getAmount)
 				.filter(Objects::nonNull)
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
-		builder.addFieldAt(total.toPlainString(), 22, 32);
+		builder.addFieldAt(total.toPlainString(), 19, 49); // Total Amount: Y=8.0cm
 
 		String receipt = builder.build();
 		System.out.println(receipt);
+
+		Path path = Paths.get("output.txt");
+
+		try {
+			Files.write(path, receipt.getBytes());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		String targetPrinter = (printer != null && !printer.isEmpty())
 				? printer
