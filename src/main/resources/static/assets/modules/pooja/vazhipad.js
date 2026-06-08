@@ -356,48 +356,40 @@ function getPoojaMasterData(id, fl) {
 	return objPoojaMasterData[id]?.[fl];
 }
 let ptid = "";
-$("#confirmPrint").on("change", function () {
-	openPrintModal(ptid);
-});
+
 function openPrintModal(tid = "pja.260104120217.96959e") {
 	ptid = tid;
-	let ism = $("#confirmPrint").is(":checked") == true ? 1 : 0;
-	$("#printFrame").attr("src", `/web/pooja/receipt/0/${tid}/${ism}`);
-	$("#printModal").removeClass("hidden");
-}
-
-function printIframe() {
-	if (confirm("Would you like to print using the Dot Matrix printer?\n\nClick OK for Dot Matrix.\nClick Cancel for Normal HTML Print.")) {
+	if (true || confirm("Would you like to print using the Dot Matrix printer?\n\nClick OK for Dot Matrix.\nClick Cancel for Normal HTML Print.")) {
 		fetch(`/api/print/dotmatrix/pooja/${ptid}`, {
 			method: "GET",
 			headers: {
 				"Authorization": localStorage.getItem("jwtToken")
 			}
 		})
-			.then(res => res.json())
-			.then(data => {
-				console.log(data);
-				alert("Sent to Dot Matrix Printer.");
-			})
-			.catch(err => {
-				console.error("Error printing to dot matrix:", err);
-				alert("Failed to send to Dot Matrix Printer.");
-			});
+		.then(res => res.json())
+		.then(data => {
+			showMessage("Success", "Sent to Dot Matrix Printer", true);
+			setTimeout(() => location.reload(), 1000);
+		})
+		.catch(err => {
+			console.error("Error printing to dot matrix:", err);
+			showMessage("Error", "Failed to send to Dot Matrix Printer", false);
+		});
 	} else {
-		const iframe = document.getElementById("printFrame");
-		const iframeWindow = iframe.contentWindow;
-		iframeWindow.focus();
-		iframeWindow.onafterprint = () => {
-			iframe.src = iframe.src;
+		let iframe = document.getElementById("hiddenPrintFrame");
+		if (!iframe) {
+			iframe = document.createElement("iframe");
+			iframe.id = "hiddenPrintFrame";
+			iframe.style.display = "none";
+			document.body.appendChild(iframe);
+		}
+		iframe.src = `/web/pooja/receipt/0/${ptid}/1`;
+		iframe.onload = function() {
+			iframe.contentWindow.focus();
+			iframe.contentWindow.print();
+			setTimeout(() => location.reload(), 1000);
 		};
-		iframeWindow.print();
 	}
-}
-
-function closeModal() {
-	document.getElementById("printModal").classList.add("hidden");
-	document.getElementById("printFrame").src = "";
-	location.reload();
 }
 
 

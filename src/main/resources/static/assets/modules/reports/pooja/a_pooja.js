@@ -291,34 +291,39 @@ $("#excelExportPooja").click(function () {
 	});
 });
 let ptid = "";
-$("#confirmPrint").on("change", function () {
-	printPoojaTransaction(ptid);
-
-});
 
 function printPoojaTransaction(id) {
 	ptid = id;
-	let ism = $("#confirmPrint").is(":checked") == true ? 1 : 0;
-	$("#printFrame").attr("src", `/web/pooja/receipt/0/${id}/${ism}`);
-	$("#printModal").removeClass("hidden");
+	if (true || confirm("Would you like to print using the Dot Matrix printer?\n\nClick OK for Dot Matrix.\nClick Cancel for Normal HTML Print.")) {
+		fetch(`/api/print/dotmatrix/pooja/${id}`, {
+			method: "GET",
+			headers: {
+				"Authorization": localStorage.getItem("jwtToken")
+			}
+		})
+			.then(res => res.json())
+			.then(data => {
+				showMessage("Success", "Sent to Dot Matrix Printer", true);
+			})
+			.catch(err => {
+				console.error("Error printing to dot matrix:", err);
+				showMessage("Error", "Failed to send to Dot Matrix Printer", false);
+			});
+	} else {
+		let iframe = document.getElementById("hiddenPrintFrame");
+		if (!iframe) {
+			iframe = document.createElement("iframe");
+			iframe.id = "hiddenPrintFrame";
+			iframe.style.display = "none";
+			document.body.appendChild(iframe);
+		}
+		iframe.src = `/web/pooja/receipt/0/${id}/1`;
+		iframe.onload = function () {
+			iframe.contentWindow.focus();
+			iframe.contentWindow.print();
+		};
+	}
 }
-
-function printIframe() {
-	const iframe = document.getElementById("printFrame");
-	const iframeWindow = iframe.contentWindow;
-	iframeWindow.focus();
-	iframeWindow.onafterprint = () => {
-		iframe.src = iframe.src;
-	};
-	iframeWindow.print();
-}
-
-function closeModal() {
-	document.getElementById("printModal").classList.add("hidden");
-	document.getElementById("printFrame").src = "";
-	location.reload();
-}
-
 function deletePoojaTransaction(id) {
 	openUniversalConfirmModal({
 		title: "Delete Voucher",
