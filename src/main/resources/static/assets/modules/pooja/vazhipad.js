@@ -324,7 +324,9 @@ function saveBulkPooja() {
 		.then(r => r.json())
 		.then(res => {
 			console.log("Saved:", res);
-			openPrintModal(res[0].transId);
+			let tids = res.map(r => r.transId).join(",");
+			localStorage.setItem("lastPoojaTid", tids);
+			openPrintModal(tids);
 			// success toast or redirect
 		})
 		.catch(err => console.error("Error:", err));
@@ -391,6 +393,20 @@ function openPrintModal(tid = "pja.260104120217.96959e") {
 		};
 	}
 }
+
+$(document).ready(function() {
+	let lastTid = localStorage.getItem("lastPoojaTid");
+	if (lastTid) {
+		$("#printPreviousPooja").removeClass("hidden");
+	}
+
+	$("#printPreviousPooja").on("click", function() {
+		let tid = localStorage.getItem("lastPoojaTid");
+		if (tid) {
+			openPrintModal(tid);
+		}
+	});
+});
 
 
 

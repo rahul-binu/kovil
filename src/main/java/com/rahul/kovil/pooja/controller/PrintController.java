@@ -189,7 +189,7 @@ public class PrintController {
 		// Build receipt — positions from pre-printed paper (cm → row/col)
 		// Origin: TOP-LEFT. Y increases downward in feed direction.
 		// Conversion: row = round(Y_cm × 2.362) [6 LPI]
-		//             col = round(X_cm × 3.937)  [10 CPI]
+		// col = round(X_cm × 3.937) [10 CPI]
 		// Paper: Length=15.5cm (feed direction), Width=10cm (horizontal)
 		// ----------------------------------------------------------------
 		DotMatrixReceiptBuilder builder = new DotMatrixReceiptBuilder(printerConfig);
@@ -220,22 +220,7 @@ public class PrintController {
 		}
 		builder.addFieldAt(poojaName, 10, 18); // Vazhipad: Y=4.4cm
 
-		// --- Devotee details (first devotee per receipt) ---
-		Vendor firstVendor = aggregatedVendor.isEmpty() ? null : aggregatedVendor.get(0);
-
-		// Name: Y=5.5cm, X=1.5cm → row=13, col=6
-		String devoteeName = firstVendor != null && firstVendor.getFullName() != null
-				? firstVendor.getFullName()
-				: "";
-		builder.addFieldAt(devoteeName, 13, 6); // Name: Y=5.5cm
-
-		// Star (Nakshatra): Y=5.5cm, X=8.0cm → row=13, col=31
-		String star = firstVendor != null && firstVendor.getNakshathra() != null
-				? firstVendor.getNakshathra().name()
-				: "";
-		builder.addFieldAt(star, 13, 31); // Star: Y=5.5cm
-
-		// Amount per devotee: Y=5.5cm, X=12.5cm → row=13, col=49
+		// --- Devotee details (multiple devotees) ---
 		Map<String, BigDecimal> vendorAmtMap = new HashMap<>();
 		for (PoojaTransaction t : aggregatedTransactions) {
 			if (t.getVendorId() == null)
@@ -245,10 +230,19 @@ public class PrintController {
 					t.getAmount() != null ? t.getAmount() : BigDecimal.ZERO,
 					BigDecimal::add);
 		}
-		BigDecimal devoteeAmt = firstVendor != null
-				? vendorAmtMap.getOrDefault(firstVendor.getTransId(), BigDecimal.ZERO)
-				: BigDecimal.ZERO;
-		builder.addFieldAt(devoteeAmt.toPlainString(), 13, 49); // Amount: Y=5.5cm
+
+		List<String[]> vendorRows = new ArrayList<>();
+		for (Vendor v : aggregatedVendor) {
+			String name = v.getFullName() != null ? v.getFullName() : "";
+			String star = v.getNakshathra() != null ? v.getNakshathra().name() : "";
+			String amt = vendorAmtMap.getOrDefault(
+					v.getTransId(),
+					BigDecimal.ZERO).toPlainString();
+			vendorRows.add(new String[] { name, star, amt });
+		}
+
+		// Name: col=6, Star: col=31, Amount: col=49, BaseRow=13, Spacing=2
+		builder.addVendorRows(6, 31, 49, 13, 2, vendorRows);
 
 		// --- Total Amount: Y=8.0cm, X=12.5cm → row=19, col=49 ---
 		BigDecimal total = aggregatedTransactions.stream()
