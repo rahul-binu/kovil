@@ -95,6 +95,11 @@ const customerSearch = new AutoSuggest({
 	}
 });
 
+$("#fullName").on("input", function () {
+	$("#vendorId").val("");
+	$("#vendorAccountId").val("");
+});
+
 function getPaymodes() {
 	fetch("/api/account/ledgers?under=11,10", {
 		method: "GET",
@@ -157,6 +162,8 @@ $("#clearDevoteeFields").click(function () {
 
 function clearDevoteeFields() {
 	$(".devotee-fields").val("");
+	$("#vendorId").val("");
+	$("#vendorAccountId").val("");
 	if (nakshatraChoice) nakshatraChoice.setChoiceByValue("");
 }
 
@@ -368,15 +375,15 @@ function openPrintModal(tid = "pja.260104120217.96959e") {
 				"Authorization": localStorage.getItem("jwtToken")
 			}
 		})
-		.then(res => res.json())
-		.then(data => {
-			showMessage("Success", "Sent to Dot Matrix Printer", true);
-			setTimeout(() => location.reload(), 1000);
-		})
-		.catch(err => {
-			console.error("Error printing to dot matrix:", err);
-			showMessage("Error", "Failed to send to Dot Matrix Printer", false);
-		});
+			.then(res => res.json())
+			.then(data => {
+				showMessage("Success", "Sent to Dot Matrix Printer", true);
+				setTimeout(() => location.reload(), 1000);
+			})
+			.catch(err => {
+				console.error("Error printing to dot matrix:", err);
+				showMessage("Error", "Failed to send to Dot Matrix Printer", false);
+			});
 	} else {
 		let iframe = document.getElementById("hiddenPrintFrame");
 		if (!iframe) {
@@ -386,7 +393,7 @@ function openPrintModal(tid = "pja.260104120217.96959e") {
 			document.body.appendChild(iframe);
 		}
 		iframe.src = `/web/pooja/receipt/0/${ptid}/1`;
-		iframe.onload = function() {
+		iframe.onload = function () {
 			iframe.contentWindow.focus();
 			iframe.contentWindow.print();
 			setTimeout(() => location.reload(), 1000);
@@ -394,13 +401,13 @@ function openPrintModal(tid = "pja.260104120217.96959e") {
 	}
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
 	let lastTid = localStorage.getItem("lastPoojaTid");
 	if (lastTid) {
 		$("#printPreviousPooja").removeClass("hidden");
 	}
 
-	$("#printPreviousPooja").on("click", function() {
+	$("#printPreviousPooja").on("click", function () {
 		let tid = localStorage.getItem("lastPoojaTid");
 		if (tid) {
 			openPrintModal(tid);
