@@ -203,13 +203,13 @@ public class PrintController {
 			receiptNo = (prefix != null ? prefix : "")
 					.replace("@N@", receipt != null ? receipt + "" : "");
 		}
-		builder.addFieldAt(receiptNo, 9, 43); // NO: Y=3.8cm
+		builder.addFieldAt(receiptNo, 1, 30); // NO: Y=3.8cm
 
 		// --- Date: Y=4.4cm, X=11.0cm → row=10, col=43 ---
 		String dateStr = aggregatedPooja.get(0).getDate() != null
 				? aggregatedPooja.get(0).getDate().format(DateTimeFormatter.ofPattern("dd-MM-yy"))
 				: "";
-		builder.addFieldAt(dateStr, 10, 43); // Date: Y=4.4cm
+		builder.addFieldAt(dateStr, 2, 30); // Date: Y=4.4cm
 
 		// --- Pooja Name (Vazhipad): Y=4.4cm, X=4.5cm → row=10, col=18 ---
 		String poojaName = "";
@@ -218,7 +218,8 @@ public class PrintController {
 					? aggregatedTransactions.get(0).getPoojaMaster().getName()
 					: "";
 		}
-		builder.addFieldAt(poojaName, 10, 18); // Vazhipad: Y=4.4cm
+		builder.addFieldAt("Sastha", 1, 3);
+		builder.addFieldAt(poojaName, 2, 3);  // Vazhipad: Y=4.4cm
 
 		// --- Devotee details (multiple devotees) ---
 		Map<String, BigDecimal> vendorAmtMap = new HashMap<>();
@@ -242,26 +243,26 @@ public class PrintController {
 		}
 
 		// Name: col=6, Star: col=31, Amount: col=49, BaseRow=13, Spacing=2
-		builder.addVendorRows(6, 31, 49, 13, 2, vendorRows);
+		builder.addVendorRows(0, 23, 45, 4, 1, vendorRows);
 
 		// --- Total Amount: Y=8.0cm, X=12.5cm → row=19, col=49 ---
 		BigDecimal total = aggregatedTransactions.stream()
 				.map(PoojaTransaction::getAmount)
 				.filter(Objects::nonNull)
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
-		builder.addFieldAt(total.toPlainString(), 19, 49); // Total Amount: Y=8.0cm
+		builder.addFieldAt(total.toPlainString(), 11, 38);
 
 		String receipt = builder.build();
 		System.out.println(receipt);
 
-		Path path = Paths.get("output.txt");
+		// Path path = Paths.get("output.txt");
 
-		try {
-			Files.write(path, receipt.getBytes());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		// try {
+		// 	Files.write(path, receipt.getBytes());
+		// } catch (IOException e) {
+		// 	// TODO Auto-generated catch block
+		// 	e.printStackTrace();
+		// }
 
 		String targetPrinter = (printer != null && !printer.isEmpty())
 				? printer
