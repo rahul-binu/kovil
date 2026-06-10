@@ -246,23 +246,23 @@ public class PrintController {
 		builder.addVendorRows(0, 23, 45, 4, 1, vendorRows);
 
 		// --- Total Amount: Y=8.0cm, X=12.5cm → row=19, col=49 ---
-		BigDecimal total = aggregatedTransactions.stream()
-				.map(PoojaTransaction::getAmount)
-				.filter(Objects::nonNull)
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
-		builder.addFieldAt(total.toPlainString(), 11, 38);
+			BigDecimal total = aggregatedTransactions.stream()
+					.map(PoojaTransaction::getAmount)
+					.filter(Objects::nonNull)
+					.reduce(BigDecimal.ZERO, BigDecimal::add);
+			builder.addFieldAt(total.toPlainString(), 10, 38);
 
 		String receipt = builder.build();
 		System.out.println(receipt);
 
-		// Path path = Paths.get("output.txt");
+		Path path = Paths.get(tids+".txt");
 
-		// try {
-		// 	Files.write(path, receipt.getBytes());
-		// } catch (IOException e) {
-		// 	// TODO Auto-generated catch block
-		// 	e.printStackTrace();
-		// }
+		try {
+			Files.write(path, receipt.getBytes());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		String targetPrinter = (printer != null && !printer.isEmpty())
 				? printer
