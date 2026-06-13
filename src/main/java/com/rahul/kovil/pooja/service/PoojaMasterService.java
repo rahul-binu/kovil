@@ -10,6 +10,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.rahul.kovil.account.entity.Ledger;
+import com.rahul.kovil.account.repository.LedgerRepository;
 import com.rahul.kovil.common.dto.PoojaAdvanceCloseRequestDto;
 import com.rahul.kovil.common.dto.PoojaMasterDto;
 import com.rahul.kovil.common.enums.BaseStatus;
@@ -26,13 +28,29 @@ public class PoojaMasterService {
 
 	private final PoojaMasterRepository poojaMasterRepository;
 
-	public PoojaMasterService(PoojaMasterRepository poojaMaster) {
+	private final LedgerRepository ledgerRepository;
+
+	public PoojaMasterService(PoojaMasterRepository poojaMaster, LedgerRepository ledgerRepository) {
 		poojaMasterRepository = poojaMaster;
+		this.ledgerRepository = ledgerRepository;
 	}
 
 	public PoojaMasterDto savePoojaMaster(PoojaMasterDto poojaDto, String tenantId) {
 		PoojaMaster pooja = modelMapper.map(poojaDto, PoojaMaster.class);
 		pooja.setTenantId(tenantId);
+		Ledger ledger = new Ledger();
+
+		ledger.setTenantId(tenantId);
+		ledger.setLedgerName(pooja.getName());
+		ledger.setAppLock(0);
+		ledger.setCreatedUser("-1");
+		ledger.setOrderNo(0);
+		ledger.setGroupUnder(13l);
+		ledger.setDescription(pooja.getName() + " Income");
+		ledger.setStatus(BaseStatus.ACTIVE);
+
+		Ledger savedLedger = ledgerRepository.save(ledger);
+		pooja.setLedgerId(savedLedger.getId());
 		PoojaMaster saved = poojaMasterRepository.save(pooja);
 		return modelMapper.map(saved, PoojaMasterDto.class);
 	}

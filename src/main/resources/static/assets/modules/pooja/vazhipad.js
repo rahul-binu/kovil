@@ -272,6 +272,7 @@ function saveBulkPooja() {
 	let poojaPrefix = $("#poojaPrefixPrefix").val();
 	let poojaDate = $("#poojaDate").val();
 	let paymode = $("#payModeChosen").val();
+	let poojaMasterLedgerId = objPoojaMasterData[poojaMasterId].ledgerId;
 
 	let totalAmountVal = toSafeNumber($("#totalAmount").val());
 	let payingAmountVal = toSafeNumber($("#payingAmount").val());
@@ -290,6 +291,8 @@ function saveBulkPooja() {
 			vendorNakshatra: devotee.nakshatra,
 
 			paymode: paymode,
+
+			ledgerId: poojaMasterLedgerId,
 
 			pooja: {
 				id: null,

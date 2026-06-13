@@ -68,5 +68,5 @@ public class PoojaMaster extends BaseEntity {
 	private BaseStatus status = BaseStatus.ACTIVE;
 
 
-	
+	private long ledgerId;
 }

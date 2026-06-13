@@ -52,26 +52,26 @@ public class PoojaController {
 
 	@PostMapping("/master")
 	public ResponseEntity<PoojaMasterDto> savePoojaMaster(@RequestBody PoojaMasterDto pooja) {
-		String tenatId = "";
+		String tenatId = "abcd";
 		return ResponseEntity.ok(poojaMasterService.savePoojaMaster(pooja, tenatId));
 	}
 
 	@PutMapping("/master")
 	public ResponseEntity<PoojaMasterDto> updatePoojaMaster(@RequestBody PoojaMasterDto pooja) {
-		String tenatId = "";
+		String tenatId = "abcd";
 		return ResponseEntity.ok(poojaMasterService.updatePoojaMaster(pooja, tenatId));
 	}
 
 	@GetMapping("/master-data")
 	public ResponseEntity<List<PoojaMasterDto>> poojaMasterData() {
-		String tenantId = "";
+		String tenantId = "abcd";
 		return ResponseEntity.ok(poojaMasterService.getPoojaMasterData(tenantId, BaseStatus.ACTIVE));
 	}
 
 	@DeleteMapping("/master/{id}")
 	public ResponseEntity<ApiResponse> deletePoojaMaster(@PathVariable Long id) {
 
-		String tenantId = "";
+		String tenantId = "abcd";
 
 		poojaMasterService.softDelete(id, tenantId);
 
@@ -142,7 +142,7 @@ public class PoojaController {
 
 	@DeleteMapping("/offering/{tid}")
 	public ResponseEntity<ApiResponse> deletePooja(@PathVariable String tid) {
-		String tenantId = "";
+		String tenantId = "abcd";
 		poojaService.softDelete(tid, tenantId);
 		ApiResponse res = ApiResponse.builder().message("Pooja deleted successfully").status(HttpStatus.OK)
 				.build();

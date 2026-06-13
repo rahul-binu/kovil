@@ -34,5 +34,6 @@ public class OfferingDto {
 	private BigDecimal advanceAmount;
 	private String bookingStatus;
 	
+	private Long ledgerId;
 }
 

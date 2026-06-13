@@ -98,11 +98,11 @@ public class PoojaService {
 
 		// accounts entry
 		Long payMode = offering.getPaymode();
-		Long poojaIncomeLedger = 11l;
+		Long poojaIncomeLedger = offering.getLedgerId();
 		Long poojaAdvanceLedger = 12l;
 
 		Long toLedger = offering.getBooking() ? poojaAdvanceLedger : poojaIncomeLedger;
-		BigDecimal amount = offering.getBooking() ? offering.getAdvanceAmount() : offering.getPooja().getAmount();
+		BigDecimal amount = offering.getBooking() ? offering.getAdvanceAmount() : offering.getPooja().getPaidAmount();
 		toLedger = poojaIncomeLedger;
 		//
 		// TransactionDto transaction = accountService.saveTransaction(new

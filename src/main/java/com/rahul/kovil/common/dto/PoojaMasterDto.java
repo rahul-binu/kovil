@@ -11,7 +11,7 @@ public class PoojaMasterDto {
     private Long id;
 
     private String prefix;
-    
+
     private String name;
 
     private String groupName;
@@ -38,4 +38,6 @@ public class PoojaMasterDto {
     private String materialsList;
 
     private Integer displayOrder;
+
+    private Long ledgerId;
 }
