@@ -157,6 +157,8 @@ public class PrintController {
 		List<Vendor> aggregatedVendor = null;
 		List<PoojaTransaction> aggregatedTransactions = new ArrayList<>();
 
+		BigDecimal totalPaidAmount = BigDecimal.ZERO;
+
 		for (String tid : splitTids) {
 			Map<String, Object> data = printService.poojaRreceiptDotPrint(tid.trim());
 			List<Pooja> pooja = (List<Pooja>) data.get("poojas");
@@ -165,6 +167,7 @@ public class PrintController {
 
 			if (pooja != null && !pooja.isEmpty()) {
 				if (aggregatedPooja == null) {
+					totalPaidAmount = pooja.get(0).getPaidAmount();
 					aggregatedPooja = pooja;
 					aggregatedVendor = vendors;
 				}
@@ -219,17 +222,16 @@ public class PrintController {
 					: "";
 		}
 		builder.addFieldAt("Sastha", 1, 3);
-		builder.addFieldAt(poojaName, 2, 3);  // Vazhipad: Y=4.4cm
+		builder.addFieldAt(poojaName, 2, 3); // Vazhipad: Y=4.4cm
 
 		// --- Devotee details (multiple devotees) ---
 		Map<String, BigDecimal> vendorAmtMap = new HashMap<>();
 		for (PoojaTransaction t : aggregatedTransactions) {
 			if (t.getVendorId() == null)
 				continue;
-			vendorAmtMap.merge(
+			vendorAmtMap.put(
 					t.getVendorId(),
-					t.getAmount() != null ? t.getAmount() : BigDecimal.ZERO,
-					BigDecimal::add);
+					t.getAmount() != null ? t.getAmount() : BigDecimal.ZERO);
 		}
 
 		List<String[]> vendorRows = new ArrayList<>();
@@ -246,16 +248,16 @@ public class PrintController {
 		builder.addVendorRows(0, 23, 45, 4, 1, vendorRows);
 
 		// --- Total Amount: Y=8.0cm, X=12.5cm → row=19, col=49 ---
-			BigDecimal total = aggregatedTransactions.stream()
-					.map(PoojaTransaction::getAmount)
-					.filter(Objects::nonNull)
-					.reduce(BigDecimal.ZERO, BigDecimal::add);
-			builder.addFieldAt(total.toPlainString(), 10, 38);
+		// BigDecimal total = aggregatedTransactions.stream()
+		// .map(PoojaTransaction::getAmount)
+		// .filter(Objects::nonNull)
+		// .reduce(BigDecimal.ZERO, BigDecimal::add);
+		builder.addFieldAt(totalPaidAmount.toPlainString(), 10, 38);
 
 		String receipt = builder.build();
 		System.out.println(receipt);
 
-		Path path = Paths.get(tids+".txt");
+		Path path = Paths.get(tids + ".txt");
 
 		try {
 			Files.write(path, receipt.getBytes());

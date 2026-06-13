@@ -19,6 +19,7 @@ public class PoojaDto {
     private LocalDateTime date;
     private BigDecimal amount;
     private BaseStatus status;
+    private BigDecimal paidAmount;
 
     public void setDate(String dateStr) {
         LocalDate date = LocalDate.parse(dateStr);

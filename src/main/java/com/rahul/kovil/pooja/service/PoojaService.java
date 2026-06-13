@@ -78,7 +78,8 @@ public class PoojaService {
 
 		Pooja pooja = new Pooja(null, vendorId, userId, transId, offering.getBooking(), offering.getBookingDate(), null,
 				offering.getAdvanceAmount(), BookingStatus.valueOf(offering.getBookingStatus()),
-				offering.getPooja().getDate(), offering.getPooja().getAmount(), offering.getPooja().getStatus());
+				offering.getPooja().getDate(), offering.getPooja().getAmount(), offering.getPooja().getPaidAmount(),
+				offering.getPooja().getStatus());
 		pooja.setTenantId(tenantId);
 
 		// Create transaction list

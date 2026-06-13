@@ -60,6 +60,9 @@ public class Pooja extends BaseEntity {
     @Column(precision = 10, scale = 2)
     private BigDecimal amount;
 
+    @Column(precision = 10, scale = 2)
+    private BigDecimal paidAmount;
+
     @Enumerated(EnumType.STRING)
     private BaseStatus status = BaseStatus.ACTIVE;
 

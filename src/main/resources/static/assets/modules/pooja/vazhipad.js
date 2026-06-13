@@ -298,6 +298,7 @@ function saveBulkPooja() {
 				devotee: devotee.vendorId,
 				date: poojaDate,
 				amount: poojaAmount,
+				paidAmount: payingAmountVal,
 				status: "ACTIVE"
 			},
 
