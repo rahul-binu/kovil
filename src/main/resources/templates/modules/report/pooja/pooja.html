@@ -46,6 +46,9 @@
 			<div class="flex flex-wrap items-center gap-3">
 				<input type="date" id="fromDate" class="border px-3 py-2 rounded-md" th:value="${fo}">
 				<input type="date" id="toDate" class="border px-3 py-2 rounded-md" th:value="${to}">
+				<select id="poojaNameFilter" class="border px-3 py-2 rounded-md">
+					<option value="">All Poojas</option>
+				</select>
 				<input id="allSearchBox" class="w-40 px-3 py-2 border rounded-md" placeholder="Search..." />
 				<button id="serchPooja"
 					class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">

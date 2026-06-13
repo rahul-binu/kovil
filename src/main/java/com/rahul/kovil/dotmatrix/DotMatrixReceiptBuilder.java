@@ -171,6 +171,34 @@ public class DotMatrixReceiptBuilder {
     }
 
     /**
+     * Convert Y in centimeters (from top) to a row number used by addFieldAt.
+     * Uses the project's empirical conversion factor: row = round(Y_cm * 2.362).
+     */
+    public static int cmToRow(double yCm) {
+        return (int) Math.round(yCm * 2.362);
+    }
+
+    /**
+     * Convert X in centimeters (from left) to a column number used by addFieldAt.
+     * Uses the project's empirical conversion factor: col = round(X_cm * 3.937).
+     */
+    public static int cmToCol(double xCm) {
+        return (int) Math.round(xCm * 3.937);
+    }
+
+    /**
+     * Convenience method to place a field using physical cm coordinates.
+     * @param content text
+     * @param yCm vertical offset in cm from top
+     * @param xCm horizontal offset in cm from left
+     */
+    public DotMatrixReceiptBuilder addFieldAtCm(String content, double yCm, double xCm) {
+        int row = cmToRow(yCm);
+        int col = cmToCol(xCm);
+        return addFieldAt(content, row, col);
+    }
+
+    /**
      * Override build() to handle null lines (gaps between positioned fields).
      * Replaces nulls with empty lines.
      */

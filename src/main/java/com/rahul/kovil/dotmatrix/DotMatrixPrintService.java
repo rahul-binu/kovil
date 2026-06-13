@@ -138,25 +138,49 @@ public class DotMatrixPrintService {
             PrinterJob job = PrinterJob.getPrinterJob();
             job.setJobName("KovilDotMatrixPrint");
             job.setPrintService(printer);
+            // Configure a custom Paper that matches the physical continuous feed paper
+            // Paper dimensions: Height = 10.0 cm (feed direction), Width = 15.5 cm
+            double cmToPts = 28.3464567; // points per cm
+            double paperHeightPts = 10.0 * cmToPts; // ~283.46 pt
+            double paperWidthPts = 15.5 * cmToPts; // ~439.43 pt
+
+            PageFormat pf = job.defaultPage();
+            Paper paper = pf.getPaper();
+            paper.setSize(paperWidthPts, paperHeightPts);
+            // Set imageable area to the full paper so Graphics2D origin is at top-left of paper
+            paper.setImageableArea(0, 0, paperWidthPts, paperHeightPts);
+            pf.setPaper(paper);
+            pf.setOrientation(PageFormat.PORTRAIT);
+
+            log.info("Configured custom Paper for printer {}: width={}pt height={}pt imageableY={}", printer.getName(), paper.getWidth(), paper.getHeight(), paper.getImageableY());
+
+            // Use the configured PageFormat when printing so Java's coordinate system matches physical paper
             job.setPrintable((graphics, pageFormat, pageIndex) -> {
                 if (pageIndex > 0) {
                     return Printable.NO_SUCH_PAGE;
                 }
 
                 Graphics2D g2 = (Graphics2D) graphics;
+                // imageableX/Y will be zero because we set imageable area to the full paper above
                 g2.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
                 g2.setPaint(Color.black);
                 g2.setFont(new Font("Monospaced", Font.PLAIN, 10));
 
-                float lineHeight = g2.getFontMetrics().getHeight();
+                FontMetrics fm = g2.getFontMetrics();
+                float lineHeight = fm.getHeight();
+                float ascent = fm.getAscent();
+
+                log.info("Printing diagnostics: font={} lineHeight={}pt ascent={}pt imageableY={} pageHeight={}pt", g2.getFont(), lineHeight, ascent, pageFormat.getImageableY(), pageFormat.getHeight());
+
                 String[] lines = textPayload.split("\\r?\\n");
-                float y = 0;
+                float y = 0f;
                 for (String line : lines) {
                     y += lineHeight;
-                    g2.drawString(line, 0, y);
+                    // drawString y param is baseline; adjust so first line sits correctly using ascent
+                    g2.drawString(line, 0, y - (lineHeight - ascent));
                 }
                 return Printable.PAGE_EXISTS;
-            });
+            }, pf);
 
             job.print();
             log.info("Successfully sent payload via PrinterJob: {}", printer.getName());

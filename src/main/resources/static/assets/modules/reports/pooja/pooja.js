@@ -88,6 +88,7 @@ function mergeData(data) {
 
 	poojaTransData = finalMerged;
 	filteredPoojaTransData = poojaTransData;
+	populatePoojaFilter();
 	applyPagination();
 }
 
@@ -171,6 +172,41 @@ function applyPagination() {
 }
 
 /* ----------------------------------------------------
+   POOJA FILTER
+---------------------------------------------------- */
+function populatePoojaFilter() {
+	// Extract unique Pooja names from the data
+	let uniquePoojas = [...new Set(poojaTransData.map(item => item['ptmaster']?.name).filter(Boolean))];
+	uniquePoojas.sort();
+
+	let filterSelect = $("#poojaNameFilter");
+	let currentValue = filterSelect.val();
+	filterSelect.find("option:not(:first)").remove();
+
+	uniquePoojas.forEach(poojaName => {
+		filterSelect.append(`<option value="${poojaName}">${poojaName}</option>`);
+	});
+
+	if (currentValue) {
+		filterSelect.val(currentValue);
+	}
+}
+
+$("#poojaNameFilter").on("change", function() {
+	let selectedPooja = $(this).val();
+
+	if (selectedPooja === "") {
+		filteredPoojaTransData = poojaTransData;
+	} else {
+		filteredPoojaTransData = poojaTransData.filter(row => {
+			return row['ptmaster']?.name === selectedPooja;
+		});
+	}
+
+	applyPagination();
+});
+
+/* ----------------------------------------------------
    INIT
 ---------------------------------------------------- */
 getPoojaData();
@@ -216,13 +252,20 @@ function emptyPoojaTable() {
 ---------------------------------------------------- */
 $("#allSearchBox").on("input", function () {
 	let searchTerm = $(this).val().toLowerCase().trim();
+	let selectedPooja = $("#poojaNameFilter").val();
+
+	// Start with Pooja filter applied
+	let baseData = selectedPooja === "" ? poojaTransData : poojaTransData.filter(row => {
+		return row['ptmaster']?.name === selectedPooja;
+	});
 
 	if (searchTerm === "") {
+		filteredPoojaTransData = baseData;
 		applyPagination();
 		return;
 	}
 
-	filteredPoojaTransData = poojaTransData.filter(row => {
+	filteredPoojaTransData = baseData.filter(row => {
 		return Object.values(row).some(v => {
 			if (!v) return false;
 			if (typeof v === "object") {
