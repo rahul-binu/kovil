@@ -93,7 +93,7 @@ public class PoojaController {
 		String userId = jwt.getUserId(token);
 		String transId = SiteHelper.transId("pja");
 		Long receiptNo = 0l;
-		return ResponseEntity.ok(poojaService.saveOffering(offering, tenantId, userId, transId, receiptNo));
+		return ResponseEntity.ok(poojaService.saveOffering(offering, tenantId, userId, transId, receiptNo,1));
 	}
 
 	@PostMapping("/offering/bulk")
@@ -116,9 +116,9 @@ public class PoojaController {
             .map(max -> max + 1)
             .orElse(1L);
 
-
+		int totalPooja = offerings.size();
 		for (OfferingDto offering : offerings) {
-			OfferingDto saved = poojaService.saveOffering(offering, tenantId, userId, transId, nextReceipt);
+			OfferingDto saved = poojaService.saveOffering(offering, tenantId, userId, transId, nextReceipt, totalPooja);
 			savedOfferings.add(saved);
 		}
 

@@ -3,6 +3,9 @@ package com.rahul.kovil.dotmatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import com.rahul.kovil.dotmatrix.DotMatrixPrinterConfig;
+import com.rahul.kovil.dotmatrix.DotMatrixReceiptBuilder;
+import java.util.Arrays;
 
 import javax.print.Doc;
 import javax.print.DocFlavor;
@@ -25,6 +28,12 @@ import java.util.List;
 
 @Service
 public class DotMatrixPrintService {
+
+    private final DotMatrixPrinterConfig printerConfig;
+
+    public DotMatrixPrintService(DotMatrixPrinterConfig printerConfig) {
+        this.printerConfig = printerConfig;
+    }
 
     private static final Logger log = LoggerFactory.getLogger(DotMatrixPrintService.class);
 
@@ -135,24 +144,29 @@ public class DotMatrixPrintService {
                 return false;
             }
 
+            // Trim receipt to fit configured paper length
+            int maxRows = DotMatrixReceiptBuilder.cmToRow(printerConfig.getPaperLengthCm());
+            String[] allLines = textPayload.split("\\r?\\n");
+            String trimmedPayload = String.join("\r\n", Arrays.copyOf(allLines, Math.min(allLines.length, maxRows)));
+
             PrinterJob job = PrinterJob.getPrinterJob();
             job.setJobName("KovilDotMatrixPrint");
             job.setPrintService(printer);
+
             // Configure a custom Paper that matches the physical continuous feed paper
-            // Paper dimensions: Height = 10.0 cm (feed direction), Width = 15.5 cm
-            double cmToPts = 28.3464567; // points per cm
-            double paperHeightPts = 10.0 * cmToPts; // ~283.46 pt
-            double paperWidthPts = 15.5 * cmToPts; // ~439.43 pt
+            // double cmToPts = 28.3464567; // points per cm
+            // double paperHeightPts = printerConfig.getPaperLengthCm() * cmToPts;
+            // double paperWidthPts = 15.5 * cmToPts; // 15.5 cm width
 
-            PageFormat pf = job.defaultPage();
-            Paper paper = pf.getPaper();
-            paper.setSize(paperWidthPts, paperHeightPts);
-            // Set imageable area to the full paper so Graphics2D origin is at top-left of paper
-            paper.setImageableArea(0, 0, paperWidthPts, paperHeightPts);
-            pf.setPaper(paper);
-            pf.setOrientation(PageFormat.PORTRAIT);
+            // PageFormat pf = job.defaultPage();
+            // Paper paper = pf.getPaper();
+            // paper.setSize(paperWidthPts, paperHeightPts);
+            // Set imageable area to the full paper — zero margins so nothing gets clipped
+            // paper.setImageableArea(0, 0, paperWidthPts, paperHeightPts);
+            // pf.setPaper(paper);
+            // pf.setOrientation(PageFormat.PORTRAIT);
 
-            log.info("Configured custom Paper for printer {}: width={}pt height={}pt imageableY={}", printer.getName(), paper.getWidth(), paper.getHeight(), paper.getImageableY());
+            // log.info("Configured custom Paper for printer {}: width={}pt height={}pt", printer.getName(), paper.getWidth(), paper.getHeight());
 
             // Use the configured PageFormat when printing so Java's coordinate system matches physical paper
             job.setPrintable((graphics, pageFormat, pageIndex) -> {
@@ -166,21 +180,16 @@ public class DotMatrixPrintService {
                 g2.setPaint(Color.black);
                 g2.setFont(new Font("Monospaced", Font.PLAIN, 10));
 
-                FontMetrics fm = g2.getFontMetrics();
-                float lineHeight = fm.getHeight();
-                float ascent = fm.getAscent();
+                float lineHeight = g2.getFontMetrics().getHeight();
 
-                log.info("Printing diagnostics: font={} lineHeight={}pt ascent={}pt imageableY={} pageHeight={}pt", g2.getFont(), lineHeight, ascent, pageFormat.getImageableY(), pageFormat.getHeight());
-
-                String[] lines = textPayload.split("\\r?\\n");
-                float y = 0f;
+                String[] lines = trimmedPayload.split("\\r?\\n");
+                float y = 0;
                 for (String line : lines) {
                     y += lineHeight;
-                    // drawString y param is baseline; adjust so first line sits correctly using ascent
-                    g2.drawString(line, 0, y - (lineHeight - ascent));
+                    g2.drawString(line, 0, y);
                 }
                 return Printable.PAGE_EXISTS;
-            }, pf);
+            });
 
             job.print();
             log.info("Successfully sent payload via PrinterJob: {}", printer.getName());

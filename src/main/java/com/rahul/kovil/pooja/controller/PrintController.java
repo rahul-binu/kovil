@@ -247,14 +247,15 @@ public class PrintController {
 		// Name: col=6, Star: col=31, Amount: col=49, BaseRow=13, Spacing=2
 		builder.addVendorRows(0, 23, 45, 4, 1, vendorRows);
 
-		// --- Total Amount: Y=8.0cm, X=12.5cm → row=19, col=49 ---
-		// BigDecimal total = aggregatedTransactions.stream()
-		// .map(PoojaTransaction::getAmount)
-		// .filter(Objects::nonNull)
-		// .reduce(BigDecimal.ZERO, BigDecimal::add);
 		builder.addFieldAt(totalPaidAmount.toPlainString(), 10, 38);
 
 		String receipt = builder.build();
+		// Trim receipt to respect configured custom paper length (cm)
+		int maxRows = DotMatrixReceiptBuilder.cmToRow(printerConfig.getPaperLengthCm());
+		String[] allLines = receipt.split("\\r?\\n");
+		if (allLines.length > maxRows) {
+			receipt = String.join("\\r\\n", java.util.Arrays.copyOf(allLines, maxRows));
+		}
 		System.out.println(receipt);
 
 		Path path = Paths.get(tids + ".txt");

@@ -10,7 +10,9 @@ public class DotMatrixPrinterConfig {
     private String printerName = "EPSON LX-310"; // Default name, can be overridden in application.properties
     private int topOffset = 0;
     private int leftOffset = 0;
-    private int feedLines = 5; // Number of extra blank lines after a receipt to move to tear-off position
+    private int feedLines = 0; // Extra blank lines after receipt (0 = no extra feed, PrinterJob handles page
+                               // advance)
+    private int paperLengthCm = 6; // Paper length in centimeters (content height, not full form)
 
     public String getPrinterName() {
         return printerName;
@@ -42,5 +44,13 @@ public class DotMatrixPrinterConfig {
 
     public void setFeedLines(int feedLines) {
         this.feedLines = feedLines;
+    }
+
+    public int getPaperLengthCm() {
+        return paperLengthCm;
+    }
+
+    public void setPaperLengthCm(int paperLengthCm) {
+        this.paperLengthCm = paperLengthCm;
     }
 }

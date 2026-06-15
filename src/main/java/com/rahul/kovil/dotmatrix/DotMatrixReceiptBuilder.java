@@ -188,9 +188,10 @@ public class DotMatrixReceiptBuilder {
 
     /**
      * Convenience method to place a field using physical cm coordinates.
+     * 
      * @param content text
-     * @param yCm vertical offset in cm from top
-     * @param xCm horizontal offset in cm from left
+     * @param yCm     vertical offset in cm from top
+     * @param xCm     horizontal offset in cm from left
      */
     public DotMatrixReceiptBuilder addFieldAtCm(String content, double yCm, double xCm) {
         int row = cmToRow(yCm);

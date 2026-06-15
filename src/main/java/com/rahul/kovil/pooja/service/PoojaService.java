@@ -1,6 +1,7 @@
 package com.rahul.kovil.pooja.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ public class PoojaService {
 
 	@Transactional
 	public OfferingDto saveOffering(OfferingDto offering, String tenantId, String userId, String transId,
-			Long nextReceipt) {
+			Long nextReceipt, int totalPooja) {
 
 		// Use injected SiteHelper, not static call
 		// String transId = SiteHelper.transId("pja");
@@ -102,7 +103,16 @@ public class PoojaService {
 		Long poojaAdvanceLedger = 12l;
 
 		Long toLedger = offering.getBooking() ? poojaAdvanceLedger : poojaIncomeLedger;
-		BigDecimal amount = offering.getBooking() ? offering.getAdvanceAmount() : offering.getPooja().getPaidAmount();
+		BigDecimal dividend = offering.getBooking() 
+			? offering.getAdvanceAmount() 
+			: offering.getPooja().getPaidAmount();
+
+		BigDecimal amount = dividend.divide(
+			BigDecimal.valueOf(totalPooja), 
+			2, 
+			RoundingMode.HALF_UP
+		);
+
 		toLedger = poojaIncomeLedger;
 		//
 		// TransactionDto transaction = accountService.saveTransaction(new
