@@ -130,7 +130,7 @@ function buildPoojaTransactionTable(data, start, limit) {
 				<td>${formatDate(item["pjbookingDate"] ?? "")}</td>
 				<td>${formatDate(item["pjbookingCloseDate"] ?? "")}</td>
                 <td>${item['ptmaster'].name ?? ""}</td>
-                <td style="text-align:right;">${toSafeNumber(item["ptamount"] ?? "").toFixed(2)}</td>
+                <td style="text-align:right;">${toSafeNumber(item["ptamount"] == 0 ? item["pjamount"] : item["ptamount"]).toFixed(2)}</td>
                 <td>${item["ptreciptno"] ?? ""}</td>
                 <td>${item["csname"] ?? ""}</td>
 				<td>${item["csmobile"] ?? ""}</td>
@@ -142,7 +142,7 @@ function buildPoojaTransactionTable(data, start, limit) {
         `);
 	}
 	// ---------- SET FOOTER ----------
-	let totalAmount = filteredPoojaTransData.reduce((sum, item) => sum + toSafeNumber(item['ptamount'] ?? 0), 0);
+	let totalAmount = filteredPoojaTransData.reduce((sum, item) => sum + toSafeNumber(item['ptamount'] == 0 ? item["pjamount"] : item["ptamount"]), 0);
 	const tfoot = `
 	    <tr>
 	        <th colspan="5" style="text-align:right;">Total</th>
@@ -295,7 +295,7 @@ $("#excelExportPooja").click(function() {
 		formatDate(item["pjbookingDate"] ?? ""),   		       
 		formatDate(item["pjbookingCloseDate"] ?? ""),   
 		item['ptmaster']?.name ?? "",           
-		toSafeNumber(item["ptamount"] ?? "").toFixed(2), 
+		toSafeNumber(item["ptamount"] == 0 ? item["pjamount"] : item["ptamount"]).toFixed(2), 
 		item["ptreciptno"] ?? "",          
 		item["csname"] ?? "",              
 		item["csmobile"] ?? "",            
@@ -305,7 +305,7 @@ $("#excelExportPooja").click(function() {
 		item["ptmaster"]?.description ?? ""
 	]);
 
-	let totalAmount = filteredPoojaTransData.reduce((sum, item) => sum + toSafeNumber(item['ptamount'] ?? 0), 0);
+	let totalAmount = filteredPoojaTransData.reduce((sum, item) => sum + toSafeNumber(item['ptamount'] == 0 ? item["pjamount"] : item["ptamount"]), 0);
 
 	poojaDataSetExcel.push(["", "", "", "", "Total", totalAmount.toFixed(2), "", "", "", "", "", "", ""]);
 

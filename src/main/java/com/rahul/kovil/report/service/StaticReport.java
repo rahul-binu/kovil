@@ -59,6 +59,12 @@ public class StaticReport {
 				});
 			}
 
+			select = select.replace(
+				"pj.amount",
+				"CASE WHEN pj.amount = 0 THEN pj.paidAmount ELSE pj.amount END"
+			);
+			System.err.println(select);
+
 			String jpql = "SELECT " + select + " FROM Pooja pj WHERE pj.status = :status";
 			if (!where.isEmpty())
 				jpql += " AND " + where;

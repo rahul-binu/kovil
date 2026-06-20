@@ -62,7 +62,7 @@ function mergeData(data) {
 		let dateVal = pj["pjdate"] ? pj["pjdate"].substring(0, 10) : "Unknown";
 		let key = poojaName + "_" + dateVal;
 
-		let amt = toSafeNumber(pt["ptamount"] ?? 0);
+		let amt = toSafeNumber(pt["ptamount"] == 0 ? pj["pjamount"] : pt["ptamount"]);
 		let devoteeName = cs["csname"] || "";
 
 		if (!grouped[key]) {
